@@ -1,0 +1,39 @@
+---
+import { Image, getImage } from 'astro:assets';
+import type { Photo } from '../lib/gallery';
+
+interface Props {
+  photo: Photo;
+  index: number;
+  eager?: boolean;
+}
+
+const { photo, index, eager = false } = Astro.props;
+
+const large = await getImage({
+  src: photo.data.image,
+  width: 1600,
+  format: 'webp',
+  quality: 78,
+});
+---
+
+<a
+  href={large.src}
+  class="photo-card"
+  data-photo-card
+  data-index={index}
+  data-full-src={large.src}
+  data-alt={photo.data.alt}
+  data-title={photo.data.title}
+>
+  <Image
+    src={photo.data.image}
+    alt={photo.data.alt}
+    widths={[480, 960]}
+    sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 33vw"
+    loading={eager ? 'eager' : 'lazy'}
+    fetchpriority={eager ? 'high' : 'auto'}
+    class="photo-card__image"
+  />
+</a>

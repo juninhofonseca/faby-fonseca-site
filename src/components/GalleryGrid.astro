@@ -1,0 +1,49 @@
+---
+import PhotoCard from './PhotoCard.astro';
+import type { Category } from '../lib/categories';
+import type { Photo } from '../lib/gallery';
+
+interface Props {
+  categories: Category[];
+  activeSlug?: string;
+  photosByCategory: Record<string, Photo[]>;
+}
+
+const { categories, activeSlug, photosByCategory } = Astro.props;
+---
+
+<div class="gallery">
+  {
+    categories.map((category) => {
+      const photos = photosByCategory[category.data.slug] ?? [];
+      const isActive = category.data.slug === activeSlug;
+      const headingId = `categoria-${category.data.slug}`;
+
+      return (
+        <section
+          class="gallery-section"
+          data-gallery-section={category.data.slug}
+          aria-labelledby={headingId}
+          hidden={!isActive}
+        >
+          <h2 id={headingId}>{category.data.name}</h2>
+          {photos.length === 0 ? (
+            <p class="empty-state">Em breve novas fotos nesta categoria.</p>
+          ) : (
+            <ul class="gallery-grid" role="list">
+              {photos.map((photo, index) => (
+                <li>
+                  <PhotoCard
+                    photo={photo}
+                    index={index}
+                    eager={isActive && index < 2}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      );
+    })
+  }
+</div>

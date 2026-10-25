@@ -1,0 +1,32 @@
+---
+import type { Category } from '../lib/categories';
+
+interface Props {
+  categories: Category[];
+  activeSlug?: string;
+}
+
+const { categories, activeSlug } = Astro.props;
+---
+
+<nav class="category-nav" aria-label="Categorias do portfólio">
+  <ul role="list">
+    {
+      categories.map((category) => {
+        const isActive = category.data.slug === activeSlug;
+        return (
+          <li>
+            <a
+              href={`/portfolio/?categoria=${category.data.slug}`}
+              class:list={['category-link', { 'is-active': isActive }]}
+              aria-current={isActive ? 'page' : undefined}
+              data-category-link={category.data.slug}
+            >
+              {category.data.name}
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+</nav>

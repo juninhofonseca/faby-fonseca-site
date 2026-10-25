@@ -1,0 +1,63 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getActiveCategories } from '../lib/categories';
+
+const categories = await getActiveCategories();
+const requested = Astro.url.searchParams.get('categoria');
+const selected = categories.some(
+  (category) => category.data.slug === requested,
+)
+  ? requested
+  : '';
+
+const selectedName = categories.find(
+  (category) => category.data.slug === selected,
+)?.data.name;
+---
+
+<BaseLayout
+  title="Contato | Faby Fonseca Fotografia"
+  description="Solicite um orçamento para casamentos, ensaios, família, newborn ou eventos."
+>
+  <h1>Contato</h1>
+  <p class="page-intro">
+    Conte o que você procura. A categoria escolhida no portfólio já vem
+    selecionada aqui e pode ser alterada.
+  </p>
+
+  <form class="contact-form">
+    <label for="categoria">Categoria de interesse</label>
+    <select id="categoria" name="categoria" data-category-select>
+      <option value="">Selecione uma categoria</option>
+      {
+        categories.map((category) => (
+          <option
+            value={category.data.slug}
+            selected={category.data.slug === selected}
+          >
+            {category.data.name}
+          </option>
+        ))
+      }
+    </select>
+
+    {
+      selectedName ? (
+        <p class="form-note" data-category-note>
+          Categoria pré-selecionada: <strong>{selectedName}</strong>.
+        </p>
+      ) : (
+        <p class="form-note" data-category-note hidden></p>
+      )
+    }
+
+    <p class="form-note">
+      O envio do formulário de orçamento será disponibilizado na próxima etapa
+      do site.
+    </p>
+  </form>
+
+  <script>
+    import '../scripts/contact.client';
+  </script>
+</BaseLayout>

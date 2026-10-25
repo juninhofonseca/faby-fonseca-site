@@ -1,0 +1,59 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CategoryNav from '../components/CategoryNav.astro';
+import GalleryGrid from '../components/GalleryGrid.astro';
+import BudgetCta from '../components/BudgetCta.astro';
+import Lightbox from '../components/Lightbox.astro';
+import {
+  findCategoryBySlug,
+  getActiveCategories,
+  resolveCategorySlug,
+} from '../lib/categories';
+import { getPhotosByCategory } from '../lib/gallery';
+
+const categories = await getActiveCategories();
+const requested = Astro.url.searchParams.get('categoria');
+const active = resolveCategorySlug(categories, requested);
+const requestedCategory = findCategoryBySlug(categories, requested);
+const photosByCategory = await getPhotosByCategory(categories);
+
+// O build estático não recebe a query string: só usa os metadados da categoria
+// quando ela veio resolvida pelo servidor (dev/SSR).
+const title = requestedCategory
+  ? `${requestedCategory.data.name} | Faby Fonseca Fotografia`
+  : 'Portfólio | Faby Fonseca Fotografia';
+const description =
+  requestedCategory?.data.description ??
+  'Galeria de casamentos, ensaios, família, newborn e eventos por Faby Fonseca.';
+---
+
+<BaseLayout title={title} description={description}>
+  <h1>Portfólio</h1>
+  <p class="page-intro">
+    Escolha uma categoria para conhecer os trabalhos e, se quiser, solicitar um
+    orçamento específico.
+  </p>
+
+  {
+    categories.length === 0 ? (
+      <p class="empty-state">Nenhuma categoria publicada no momento.</p>
+    ) : (
+      <>
+        <CategoryNav categories={categories} activeSlug={active?.data.slug} />
+        <GalleryGrid
+          categories={categories}
+          activeSlug={active?.data.slug}
+          photosByCategory={photosByCategory}
+        />
+        <BudgetCta category={active} />
+      </>
+    )
+  }
+
+  <Lightbox label="Visualização ampliada" />
+
+  <script>
+    import '../scripts/gallery.client';
+    import '../scripts/lightbox.client';
+  </script>
+</BaseLayout>

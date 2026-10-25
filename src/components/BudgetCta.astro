@@ -1,0 +1,23 @@
+---
+import type { Category } from '../lib/categories';
+
+interface Props {
+  category?: Category;
+}
+
+const { category } = Astro.props;
+---
+
+{
+  category && (
+    <p class="budget-cta">
+      <a
+        class="button"
+        href={`/contato/?categoria=${category.data.slug}`}
+        data-budget-cta
+      >
+        Quero um orçamento desta categoria
+      </a>
+    </p>
+  )
+}

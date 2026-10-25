@@ -1,0 +1,31 @@
+{
+  "name": "faby-fonseca-site",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && node scripts/check-image-budget.mjs",
+    "preview": "astro preview",
+    "check": "astro check",
+    "check:images": "node scripts/check-image-budget.mjs",
+    "validate:content": "node scripts/validate-content.mjs",
+    "test:content": "node --test \"tests/content/**/*.test.mjs\"",
+    "test:e2e": "playwright test",
+    "test:a11y": "playwright test tests/a11y",
+    "test:lighthouse": "lhci autorun"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.4.2",
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@axe-core/playwright": "^4.14.0",
+    "@lhci/cli": "^0.15.1",
+    "@playwright/test": "^1.64.1",
+    "gray-matter": "^4.0.3",
+    "typescript": "^6.0.3"
+  }
+}

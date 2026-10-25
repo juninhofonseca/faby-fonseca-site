@@ -1,0 +1,71 @@
+media:
+  - name: photos
+    label: Fotos do portfólio
+    input: content/photos/images
+    output: images
+    rename: safe
+    extensions: [jpg, jpeg, png, webp]
+
+content:
+  - name: categories
+    label: Categorias
+    type: collection
+    path: content/categories
+    filename: "{fields.slug}.md"
+    view:
+      primary: name
+    fields:
+      - name: name
+        label: Nome
+        type: string
+      - name: slug
+        label: Slug
+        type: string
+        description: Letras minúsculas, números e hífens. Não altere depois de publicado.
+      - name: description
+        label: Descrição curta
+        type: text
+      - name: order
+        label: Ordem
+        type: number
+      - name: active
+        label: Ativa
+        type: boolean
+
+  - name: photos
+    label: Fotos
+    type: collection
+    path: content/photos
+    filename: "{fields.title}.md"
+    view:
+      primary: title
+    fields:
+      - name: title
+        label: Título interno
+        type: string
+      - name: alt
+        label: Texto alternativo
+        type: string
+        description: Descreva a foto para quem não pode vê-la. Máximo de 160 caracteres.
+      - name: image
+        label: Imagem
+        type: image
+        options:
+          media: photos
+      - name: category
+        label: Categoria
+        type: reference
+        options:
+          collection: categories
+          value: "{fields.slug}"
+          label: "{fields.name}"
+          search: "fields.name"
+      - name: order
+        label: Ordem na categoria
+        type: number
+      - name: publishedAt
+        label: Data de publicação
+        type: date
+      - name: published
+        label: Publicada
+        type: boolean
