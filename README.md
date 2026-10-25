@@ -13,7 +13,7 @@ acessível e encaminhamento para orçamento.
 
 ## Requisitos
 
-- Node.js 22 LTS ou superior
+- Node.js 24 LTS ou superior (Astro 7 exige `>= 22.23.4`)
 - npm 10 ou superior
 
 ## Instalação

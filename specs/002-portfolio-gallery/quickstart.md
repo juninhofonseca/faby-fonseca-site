@@ -8,7 +8,7 @@ implementação; os detalhes de formato estão em [contracts/](./contracts/) e
 
 ## Pré-requisitos
 
-- Node.js 22 LTS e npm 10+.
+- Node.js 24 LTS e npm 10+.
 - Git com acesso ao repositório `juninhofonseca/faby-fonseca-site`.
 - Repositório público no GitHub com Pages habilitado (Settings → Pages → GitHub Actions).
 - Conta no Pages CMS com o aplicativo autorizado no repositório.
