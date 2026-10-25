@@ -1,18 +1,27 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ContactForm from '../components/ContactForm.astro';
 import { getActiveCategories } from '../lib/categories';
+import { withBase } from '../lib/urls';
+import {
+  CONTACT_EMAIL,
+  buildMailtoHref,
+  buildWhatsappHref,
+  getWeb3FormsKey,
+  isFormConfigured,
+} from '../lib/contact';
 
 const categories = await getActiveCategories();
-const requested = Astro.url.searchParams.get('categoria');
-const selected = categories.some(
-  (category) => category.data.slug === requested,
-)
-  ? requested
-  : '';
 
-const selectedName = categories.find(
-  (category) => category.data.slug === selected,
-)?.data.name;
+const accessKey = getWeb3FormsKey();
+const formConfigured = isFormConfigured(accessKey);
+
+// Envio sem JavaScript: o Web3Forms redireciona para uma página estática de confirmação.
+const siteOrigin = Astro.site ?? new URL('https://fabyfonseca.com.br');
+const redirectUrl = new URL(withBase('/contato/enviado/'), siteOrigin).href;
+
+const emailHref = buildMailtoHref();
+const whatsappHref = buildWhatsappHref();
 ---
 
 <BaseLayout
@@ -21,41 +30,38 @@ const selectedName = categories.find(
 >
   <h1>Contato</h1>
   <p class="page-intro">
-    Conte o que você procura. A categoria escolhida no portfólio já vem
-    selecionada aqui e pode ser alterada.
+    Conte o que você procura e receba um orçamento personalizado. A categoria escolhida no
+    portfólio já vem selecionada aqui e pode ser alterada.
   </p>
 
-  <form class="contact-form">
-    <label for="categoria">Categoria de interesse</label>
-    <select id="categoria" name="categoria" data-category-select>
-      <option value="">Selecione uma categoria</option>
-      {
-        categories.map((category) => (
-          <option
-            value={category.data.slug}
-            selected={category.data.slug === selected}
-          >
-            {category.data.name}
-          </option>
-        ))
-      }
-    </select>
-
-    {
-      selectedName ? (
-        <p class="form-note" data-category-note>
-          Categoria pré-selecionada: <strong>{selectedName}</strong>.
+  {
+    formConfigured ? (
+      <ContactForm
+        categories={categories}
+        accessKey={accessKey}
+        redirectUrl={redirectUrl}
+        source="direto"
+      />
+    ) : (
+      <section class="contact-direct" data-direct-contact aria-labelledby="contato-direto">
+        <h2 id="contato-direto">Fale direto com a Faby</h2>
+        <p>
+          Para pedir um orçamento, envie um e-mail ou fale pelo WhatsApp. A resposta chega em até
+          2 dias úteis.
         </p>
-      ) : (
-        <p class="form-note" data-category-note hidden></p>
-      )
-    }
-
-    <p class="form-note">
-      O envio do formulário de orçamento será disponibilizado na próxima etapa
-      do site.
-    </p>
-  </form>
+        <ul>
+          <li>
+            <a href={emailHref} data-contact-email>{CONTACT_EMAIL}</a>
+          </li>
+          <li>
+            <a href={whatsappHref} target="_blank" rel="noopener noreferrer" data-contact-whatsapp>
+              WhatsApp
+            </a>
+          </li>
+        </ul>
+      </section>
+    )
+  }
 
   <script>
     import '../scripts/contact.client';

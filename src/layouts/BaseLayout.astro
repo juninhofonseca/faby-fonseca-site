@@ -1,15 +1,18 @@
 ---
 import '../styles/global.css';
 import { withBase } from '../lib/urls';
+import { CONTACT_EMAIL, buildMailtoHref, buildWhatsappHref } from '../lib/contact';
 
 interface Props {
   title: string;
   description?: string;
+  noindex?: boolean;
 }
 
 const {
   title,
   description = 'Portfólio fotográfico de Faby Fonseca: casamentos, ensaios, família, newborn e eventos.',
+  noindex = false,
 } = Astro.props;
 
 const canonical = Astro.site
@@ -24,6 +27,7 @@ const canonical = Astro.site
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="app-base" content={import.meta.env.BASE_URL} />
+    {noindex ? <meta name="robots" content="noindex" /> : null}
     <link rel="canonical" href={canonical} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -64,6 +68,19 @@ const canonical = Astro.site
     <footer class="site-footer">
       <div class="container">
         <p>© {new Date().getFullYear()} Faby Fonseca Fotografia. Todos os direitos reservados.</p>
+        <ul class="site-footer__links">
+          <li>
+            <a href={buildMailtoHref()}>{CONTACT_EMAIL}</a>
+          </li>
+          <li>
+            <a href={buildWhatsappHref()} target="_blank" rel="noopener noreferrer">
+              WhatsApp
+            </a>
+          </li>
+          <li>
+            <a href={withBase('/privacidade/')}>Política de Privacidade</a>
+          </li>
+        </ul>
       </div>
     </footer>
   </body>

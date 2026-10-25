@@ -11,10 +11,10 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: 'npm run preview -- --port 4321',
+    command: 'npm run build:test && npm run preview -- --port 4321',
     url: 'http://localhost:4321',
     reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
+    timeout: 180_000,
   },
   projects: [
     {

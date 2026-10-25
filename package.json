@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build && node scripts/check-image-budget.mjs",
+    "build:test": "node scripts/build-test.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "check:images": "node scripts/check-image-budget.mjs",

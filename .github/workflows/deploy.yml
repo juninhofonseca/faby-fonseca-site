@@ -39,6 +39,9 @@ jobs:
           # Ao ativar o domínio próprio, remova estas duas variáveis.
           SITE_URL: https://juninhofonseca.github.io
           SITE_BASE: /faby-fonseca-site
+          # Chave de envio do formulário (Settings -> Secrets and variables -> Actions -> Variables).
+          # Vazia = a página de contato mostra e-mail e WhatsApp em vez do formulário.
+          PUBLIC_WEB3FORMS_KEY: ${{ vars.WEB3FORMS_KEY }}
         run: |
           if ! npm run build > build.log 2>&1; then
             tail -n 40 build.log

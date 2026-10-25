@@ -2,7 +2,11 @@
   "ci": {
     "collect": {
       "startServerCommand": "npm run preview -- --port 4322",
-      "url": ["http://localhost:4322/portfolio/"],
+      "url": [
+        "http://localhost:4322/portfolio/",
+        "http://localhost:4322/contato/",
+        "http://localhost:4322/privacidade/"
+      ],
       "numberOfRuns": 1
     },
     "assert": {

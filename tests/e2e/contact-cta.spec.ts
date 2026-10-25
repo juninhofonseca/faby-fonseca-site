@@ -16,9 +16,11 @@ test.describe('Encaminhamento para orçamento', () => {
 
     await expect(page).toHaveURL(/\/contato\/\?categoria=newborn/);
     await expect(page.locator('[data-category-select]')).toHaveValue('newborn');
+    await expect(page.locator('[data-category-note]')).toContainText('Categoria pré-selecionada: Newborn');
 
     await page.locator('[data-category-select]').selectOption('ensaios');
     await expect(page.locator('[data-category-select]')).toHaveValue('ensaios');
+    await expect(page.locator('[data-category-note]')).toContainText('Categoria selecionada: Ensaios');
   });
 
   test('parâmetro inválido abre o contato sem seleção', async ({ page }) => {

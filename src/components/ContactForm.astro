@@ -1,0 +1,185 @@
+---
+import type { Category } from '../lib/categories';
+import { withBase } from '../lib/urls';
+import {
+  CONTACT_EMAIL,
+  DETAILS_MAX_LENGTH,
+  MIN_FILL_TIME_MS,
+  PRIVACY_EFFECTIVE_AT,
+  PRIVACY_VERSION,
+  buildMailtoHref,
+  buildWhatsappHref,
+  formatPrivacyDate,
+} from '../lib/contact';
+
+interface Props {
+  categories: Category[];
+  accessKey: string;
+  redirectUrl: string;
+  source: string;
+}
+
+const { categories, accessKey, redirectUrl, source } = Astro.props;
+
+const privacyPath = withBase('/privacidade/');
+const effectiveDate = formatPrivacyDate(PRIVACY_EFFECTIVE_AT);
+
+const fields = [
+  { name: 'name', label: 'Nome', type: 'text', autocomplete: 'name', maxlength: 100 },
+  { name: 'phone', label: 'Telefone ou WhatsApp', type: 'tel', autocomplete: 'tel', maxlength: 20 },
+  { name: 'email', label: 'E-mail', type: 'email', autocomplete: 'email', maxlength: 254 },
+] as const;
+---
+
+<form
+  class="contact-form"
+  data-contact-form
+  data-min-fill-ms={MIN_FILL_TIME_MS}
+  method="post"
+  action="https://api.web3forms.com/submit"
+>
+  <input type="hidden" name="access_key" value={accessKey} />
+  <input type="hidden" name="subject" value="Novo pedido de orçamento pelo site" data-subject />
+  <input type="hidden" name="from_name" value="Site Faby Fonseca" />
+  <input type="hidden" name="consent_version" value={PRIVACY_VERSION} />
+  <input type="hidden" name="consent_at" value="" data-consent-at />
+  <input type="hidden" name="source" value={source} />
+  <input type="hidden" name="redirect" value={redirectUrl} />
+
+  <div class="honeypot" aria-hidden="true">
+    <label for="website">Não preencha este campo</label>
+    <input
+      id="website"
+      type="text"
+      name="website"
+      tabindex="-1"
+      autocomplete="off"
+      data-honeypot="website"
+    />
+  </div>
+
+  <input
+    class="honeypot"
+    type="checkbox"
+    name="botcheck"
+    tabindex="-1"
+    aria-hidden="true"
+    data-honeypot="botcheck"
+  />
+
+  {
+    fields.map((field) => (
+      <div class="form-field">
+        <label for={field.name}>
+          {field.label} <span class="form-required" aria-hidden="true">*</span>
+        </label>
+        {field.name === 'phone' ? (
+          <p class="form-note" id="dica-phone">
+            Com DDD, por exemplo (11) 91234-5678.
+          </p>
+        ) : null}
+        <input
+          id={field.name}
+          name={field.name}
+          type={field.type}
+          autocomplete={field.autocomplete}
+          maxlength={field.maxlength}
+          required
+          aria-describedby={field.name === 'phone' ? 'dica-phone erro-phone' : `erro-${field.name}`}
+          data-field={field.name}
+        />
+        <p class="field-error" id={`erro-${field.name}`} data-error-for={field.name} hidden></p>
+      </div>
+    ))
+  }
+
+  <div class="form-field">
+    <label for="category">
+      Categoria de interesse <span class="form-required" aria-hidden="true">*</span>
+    </label>
+    <select
+      id="category"
+      name="category"
+      required
+      aria-describedby="erro-category"
+      data-field="category"
+      data-category-select
+    >
+      <option value="">Selecione uma categoria</option>
+      {
+        categories.map((category) => (
+          <option value={category.data.slug}>{category.data.name}</option>
+        ))
+      }
+    </select>
+    <p class="form-note" data-category-note hidden></p>
+    <p class="field-error" id="erro-category" data-error-for="category" hidden></p>
+  </div>
+
+  <div class="form-field">
+    <label for="details">
+      Detalhes do evento <span class="form-required" aria-hidden="true">*</span>
+    </label>
+    <p class="form-note" id="dica-details">
+      Conte a data, o local e o tipo de evento (casamento, ensaio, família) para o orçamento sair
+      mais preciso.
+    </p>
+    <textarea
+      id="details"
+      name="details"
+      rows="6"
+      maxlength={DETAILS_MAX_LENGTH}
+      required
+      aria-describedby="dica-details erro-details"
+      data-field="details"
+    ></textarea>
+    <p class="form-counter" data-counter>0/{DETAILS_MAX_LENGTH}</p>
+    <p class="field-error" id="erro-details" data-error-for="details" hidden></p>
+  </div>
+
+  <div class="form-consent">
+    <input
+      id="consent"
+      name="consent"
+      type="checkbox"
+      value="sim"
+      required
+      aria-describedby="erro-consent"
+      data-field="consent"
+    />
+    <label for="consent">
+      Autorizo o contato e o uso dos meus dados (nome, telefone, e-mail, categoria e detalhes do
+      evento) para responder a este pedido, conforme a
+      <a href={privacyPath}>política de privacidade</a>.
+      <span class="form-note">
+        Versão {PRIVACY_VERSION}, vigente desde {effectiveDate}. Os dados não são usados para
+        marketing.
+      </span>
+    </label>
+    <p class="field-error" id="erro-consent" data-error-for="consent" hidden></p>
+  </div>
+
+  <div class="form-actions">
+    <button class="button" type="submit" data-submit>Enviar pedido</button>
+    <p class="form-note">Resposta em até 2 dias úteis.</p>
+  </div>
+
+  <div class="form-status" role="status" tabindex="-1" data-form-status hidden>
+    <h2 tabindex="-1" data-status-title>Pedido enviado</h2>
+    <p>
+      Obrigada pelo contato! A Faby vai responder no e-mail informado. Se preferir falar agora,
+      use o WhatsApp no rodapé.
+    </p>
+  </div>
+
+  <div class="form-error" role="alert" tabindex="-1" data-form-error hidden>
+    <h2 tabindex="-1" data-error-title>Não foi possível enviar</h2>
+    <p data-error-message>
+      Algo falhou no envio. Seus dados continuam aqui: tente novamente em instantes.
+    </p>
+    <p>
+      Se preferir, fale direto pelo e-mail <a href={buildMailtoHref()} data-error-email>{CONTACT_EMAIL}</a>
+      ou pelo <a href={buildWhatsappHref()} data-error-whatsapp>WhatsApp</a>.
+    </p>
+  </div>
+</form>

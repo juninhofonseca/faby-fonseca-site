@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { withBase } from '../../lib/urls';
+import {
+  CONTACT_EMAIL,
+  buildMailtoHref,
+  buildWhatsappHref,
+} from '../../lib/contact';
+
+const emailHref = buildMailtoHref();
+const whatsappHref = buildWhatsappHref();
+---
+
+<BaseLayout
+  title="Pedido enviado | Faby Fonseca Fotografia"
+  description="Confirmação do envio do pedido de orçamento."
+  noindex
+>
+  <h1>Pedido enviado</h1>
+  <p class="page-intro">
+    Obrigada pelo contato! A Faby vai responder no e-mail informado em até 2 dias úteis.
+  </p>
+
+  <div class="form-status" role="status" data-sent-panel>
+    <h2>O que acontece agora</h2>
+    <p>
+      Seu pedido chegou na caixa da Faby com os dados que você informou. Se precisar adiantar
+      algum detalhe, fale pelo e-mail <a href={emailHref}>{CONTACT_EMAIL}</a> ou pelo
+      <a href={whatsappHref} target="_blank" rel="noopener noreferrer">WhatsApp</a>.
+    </p>
+    <p>
+      <a href={withBase('/portfolio/')}>Voltar ao portfólio</a>
+    </p>
+  </div>
+</BaseLayout>

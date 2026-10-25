@@ -1,0 +1,130 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import {
+  CONTACT_EMAIL,
+  PRIVACY_EFFECTIVE_AT,
+  PRIVACY_VERSION,
+  buildMailtoHref,
+  buildWhatsappHref,
+  formatPrivacyDate,
+} from '../lib/contact';
+
+const effectiveDate = formatPrivacyDate(PRIVACY_EFFECTIVE_AT);
+const emailHref = buildMailtoHref();
+const whatsappHref = buildWhatsappHref();
+---
+
+<BaseLayout
+  title="Política de Privacidade | Faby Fonseca Fotografia"
+  description="Como os dados enviados pelo formulário de orçamento são coletados, usados, compartilhados e excluídos."
+>
+  <article class="privacy-page">
+    <h1>Política de Privacidade</h1>
+
+    <p class="page-intro">
+      Esta página explica, em linguagem simples, quais dados o site coleta, para que servem, com
+      quem são compartilhados e como você pode pedir correção ou exclusão. Ela segue a Lei Geral de
+      Proteção de Dados (LGPD — Lei nº 13.709/2018).
+    </p>
+
+    <h2>1. Quem trata os dados</h2>
+    <p>
+      Os dados enviados pelo formulário de orçamento são tratados por <strong>Faby Fonseca
+      Fotografia</strong>, que responde como controladora. O canal de contato é o e-mail
+      <a href={emailHref}>{CONTACT_EMAIL}</a>.
+    </p>
+
+    <h2>2. Quais dados são coletados</h2>
+    <p>Apenas os dados necessários para responder a um pedido de orçamento:</p>
+    <ul>
+      <li>nome;</li>
+      <li>telefone ou WhatsApp;</li>
+      <li>e-mail;</li>
+      <li>categoria de serviço escolhida;</li>
+      <li>detalhes do evento informados por você.</li>
+    </ul>
+    <p>
+      O site não coleta CPF, dados de pagamento, endereço, dados de saúde ou qualquer informação
+      sensível. Não é necessário criar conta para pedir um orçamento.
+    </p>
+
+    <h2>3. Para que servem os dados</h2>
+    <p>
+      Os dados são usados exclusivamente para responder ao seu pedido de orçamento, esclarecer
+      dúvidas sobre o serviço e dar seguimento a uma eventual contratação. Eles não são usados para
+      marketing, não alimentam listas de divulgação e não são vendidos.
+    </p>
+
+    <h2>4. Base legal</h2>
+    <p>
+      O tratamento acontece com base no seu <strong>consentimento</strong> (art. 7º, I, da LGPD),
+      manifestado ao marcar a caixa de autorização no formulário antes do envio. Você pode revogar
+      esse consentimento a qualquer momento pelo canal indicado no item 8.
+    </p>
+
+    <h2>5. Com quem os dados são compartilhados</h2>
+    <p>
+      O formulário é entregue por e-mail por meio do <strong>Web3Forms</strong>, que atua como
+      operador apenas para transportar a mensagem até a caixa da Faby. O e-mail é recebido em um
+      provedor de correio eletrônico. Esses serviços têm acesso aos dados somente para realizar a
+      entrega e não estão autorizados a usá-los para outras finalidades.
+    </p>
+    <p>
+      Fora desses casos, os dados não são compartilhados com terceiros, exceto por obrigação legal
+      ou ordem judicial.
+    </p>
+
+    <h2>6. Por quanto tempo os dados ficam guardados</h2>
+    <p>
+      As mensagens ficam na caixa de e-mail por até <strong>12 meses</strong> após o último contato,
+      prazo usado para acompanhar pedidos e contratações em andamento. Depois disso são apagadas.
+      Se você pedir a exclusão antes, a mensagem é removida em até <strong>15 dias</strong>, salvo
+      quando a guarda for exigida por lei.
+    </p>
+
+    <h2>7. Seus direitos</h2>
+    <p>Você pode solicitar, a qualquer momento:</p>
+    <ul>
+      <li>confirmação de que seus dados são tratados;</li>
+      <li>acesso aos dados que estão guardados;</li>
+      <li>correção de dados incompletos ou desatualizados;</li>
+      <li>exclusão dos dados tratados com base no consentimento;</li>
+      <li>revogação do consentimento;</li>
+      <li>portabilidade dos dados para outro fornecedor;</li>
+      <li>informação sobre com quem os dados foram compartilhados.</li>
+    </ul>
+
+    <h2>8. Como exercer seus direitos</h2>
+    <p>
+      Envie um e-mail para <a href={emailHref}>{CONTACT_EMAIL}</a> ou fale pelo
+      <a href={whatsappHref} target="_blank" rel="noopener noreferrer">WhatsApp</a> informando o
+      pedido. A resposta é enviada em até 15 dias. Para localizar sua mensagem, podemos pedir o
+      nome e o e-mail usados no formulário.
+    </p>
+
+    <h2>9. Cookies e analytics</h2>
+    <p>
+      O site <strong>não usa cookies</strong>, não executa rastreadores de terceiros e não possui
+      ferramenta de analytics. Nenhum dado de navegação é coletado ou vendido. Por isso não existe
+      banner de cookies.
+    </p>
+
+    <h2>10. Segurança</h2>
+    <p>
+      O site é publicado com HTTPS, e o acesso à caixa de e-mail que recebe os pedidos é restrito à
+      responsável. O site não mantém banco de dados próprio: os dados existem apenas na mensagem
+      entregue por e-mail.
+    </p>
+
+    <h2>11. Alterações nesta política</h2>
+    <p>
+      Se a forma de tratamento dos dados mudar, esta página é atualizada e a nova versão passa a
+      valer na data indicada abaixo. Pedidos anteriores permanecem vinculados à versão do aviso
+      aceita no momento do envio.
+    </p>
+
+    <p class="privacy-version">
+      Versão {PRIVACY_VERSION} — vigente desde {effectiveDate}.
+    </p>
+  </article>
+</BaseLayout>

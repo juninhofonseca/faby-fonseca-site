@@ -142,3 +142,127 @@ dispositivo físico permanece como verificação manual recomendada antes do an�
 2. **Inspeção visual manual** — zoom 200%, leitor de tela e dispositivos reais.
 3. **Conteúdo real e identidade visual** — as 6 fotos são amostras geradas e a paleta é provisória
    (`TODO(BRAND_IDENTITY)` em `src/styles/tokens.css`).
+
+---
+
+# Validação — Formulário de Contato e LGPD
+
+**Feature**: `003-formulario-contato` | **Data**: 2026-10-25
+**Ambiente**: Windows 11, Node.js v24.19.0, npm 11.17.0, Astro 7.4.2, Chromium (Playwright)
+
+Resultados dos cenários de [quickstart.md](../specs/003-formulario-contato/quickstart.md) e da
+suíte automatizada. Os testes usam a chave fictícia `chave-de-teste-e2e` e interceptam
+`https://api.web3forms.com/submit`; nenhum envio real depende do CI.
+
+## Resumo
+
+| Verificação | Comando | Resultado |
+|---|---|---|
+| Conteúdo (categorias, fotos, alt, imagens) | `npm run validate:content` | ✅ 5 categorias e 6 fotos válidas |
+| Regras de conteúdo (unitárias) | `npm run test:content` | ✅ 8/8 |
+| Tipos e Astro | `npm run check` | ✅ 0 erros, 0 avisos, 0 dicas (37 arquivos) |
+| Build de teste + orçamento de imagens | `npm run build:test` | ✅ 5 páginas; 12 variantes de grade ≤ 300 KB |
+| E2E + acessibilidade (desktop e mobile) | `npm run test:e2e` | ✅ 70/70 |
+| Lighthouse CI (mobile, 4G simulado) | `npm run test:lighthouse` | ✅ 3 rotas aprovadas |
+
+Rotas geradas: `/`, `/portfolio/`, `/contato/`, `/contato/enviado/`, `/privacidade/`.
+
+## Resultados do Lighthouse
+
+Execução em `dist/` (build de teste) via `npm run preview -- --port 4322`:
+
+| Rota | Performance | Acessibilidade | Boas práticas | SEO | LCP | CLS | TBT |
+|---|---|---|---|---|---|---|---|
+| `/portfolio/` | 100 | 100 | 96 | 100 | 0,91 s | 0 | 0 ms |
+| `/contato/` | 100 | 100 | 96 | 100 | 0,90 s | 0 | 0 ms |
+| `/privacidade/` | 100 | 100 | 96 | 100 | 0,91 s | 0 | 0 ms |
+
+As asserções de `.lighthouserc.json` (acessibilidade 100, LCP < 3 s, CLS < 0,1) passaram nas três
+rotas. Nenhum script de terceiros é carregado: o envio do Web3Forms é uma chamada `fetch` feita
+apenas no momento do submit.
+
+## Cobertura automatizada do formulário
+
+`tests/e2e/contact-form.spec.ts` (10 casos × desktop e mobile) e `tests/e2e/privacy.spec.ts`
+(4 casos × desktop e mobile), além dos testes de acessibilidade:
+
+- Envio válido com payload completo: `name`, `phone`, `email`, `category`, `details`, `consent`,
+  `consent_version`, `consent_at`, `from_name`, `source` e assunto com categoria e nome.
+- Confirmação visível, foco no título do painel e formulário limpo após o envio.
+- `localStorage`, `sessionStorage`, cookies e URL vazios após o envio (FR-007, FR-014).
+- Envio vazio bloqueado com foco no primeiro campo inválido.
+- E-mail inválido recusado sem chamada de rede.
+- Consentimento ausente bloqueia o envio e foca a caixa de autorização.
+- Erro HTTP 500 mantém os dados e mostra e-mail e WhatsApp como alternativa.
+- Falha de rede tratada como erro recuperável, com dados preservados.
+- Honeypot `website` preenchido: nenhuma requisição, sem revelar a proteção.
+- Envio em menos de 3 s recusado com pedido de nova tentativa e sem requisição.
+- Pré-seleção da categoria por `?categoria=` e troca com atualização da nota.
+- Limite de 1000 caracteres no campo de detalhes e contador sincronizado.
+- Sem JavaScript: `method="post"`, `action` correto, chave e `redirect` presentes, consentimento
+  desmarcado, e confirmação em `/contato/enviado/`.
+- Política acessível pelo rodapé de `/`, `/portfolio/` e `/contato/`, com as 11 seções, menção ao
+  Web3Forms, ausência de cookies, e-mail de contato e versão/data corretas.
+- axe-core sem violações em `/contato/` (inclusive com erros visíveis) e `/privacidade/`.
+
+## Checklist de Privacidade e LGPD
+
+Revisão item por item do checklist de [plan.md](../specs/003-formulario-contato/plan.md).
+
+| # | Item | Resultado | Evidência |
+|---|---|---|---|
+| P1 | Coleta mínima | ✅ | Formulário tem só nome, telefone, e-mail, categoria, detalhes; nenhum campo extra no DOM |
+| P2 | Finalidade declarada | ✅ | Bloco de consentimento antes do botão, com link para a política |
+| P3 | Base legal | ✅ | Seção 4 da política cita consentimento (art. 7º, I, da LGPD) |
+| P4 | Consentimento registrado | ✅ | Teste de payload confirma `consent`, `consent_version` e `consent_at` |
+| P5 | Consentimento não pré-marcado | ✅ | HTML gerado sem `checked`; teste confirma `not.toBeChecked()` |
+| P6 | Política acessível | ✅ | `/privacidade/` ligada no rodapé das 3 páginas e no formulário |
+| P7 | Compartilhamento declarado | ✅ | Seção 5 nomeia Web3Forms (operador) e o provedor de e-mail |
+| P8 | Retenção definida | ✅ | Seção 6: 12 meses após o último contato; exclusão em 15 dias |
+| P9 | Direitos do titular | ✅ | Seção 7 lista os direitos; seção 8 dá e-mail e WhatsApp |
+| P10 | Sem dados no repositório | ✅ | Busca em `src`, `tests`, `specs`, `docs` só encontra dados fictícios e a chave de teste |
+| P11 | Sem dados no cliente | ✅ | Teste E2E verifica `localStorage`, `sessionStorage`, cookies e URL vazios |
+| P12 | Sem rastreamento | ✅ | Nenhum analytics, pixel, cookie ou script externo no `dist/` |
+| P13 | Segurança do canal | ✅ | GitHub Pages força HTTPS; acesso à caixa restrito à responsável |
+| P14 | Serviço adequado | ⏳ | Depende de restringir o domínio no painel do Web3Forms (passo manual) |
+| P15 | Dados de teste | ✅ | Envio real com dados fictícios recebido e conferido; mensagem de teste apagada |
+
+Itens P14 e P15 são manuais e dependem da chave real; o resultado é registrado na seção de
+validação manual abaixo.
+
+## Verificação de dados sensíveis
+
+- `.env` não existe no repositório e está no `.gitignore` (com exceção para `.env.example`, que não
+  tem valor).
+- Apenas a chave fictícia `chave-de-teste-e2e` aparece em `scripts/build-test.mjs` e nos testes.
+- Nenhuma chave real, token ou dado de visitante em `git status`, `git diff` ou arquivos
+  versionados.
+- O e-mail e o WhatsApp em `src/lib/contact.ts` são dados públicos divulgados de propósito.
+
+## Validação manual com a chave real
+
+Build com `PUBLIC_WEB3FORMS_KEY` no `.env` local e `npm run preview -- --port 4399`:
+
+- `/contato/` renderizou o formulário completo com a chave real no campo oculto `access_key`
+  (prefixo `e337df76`, 36 caracteres).
+- Envio preenchido com dados fictícios: nome "Teste Site Faby", telefone "(11) 90000-0000",
+  e-mail `teste.site@exemplo.com`, categoria "Ensaios" e detalhes marcados como teste.
+- Resposta HTTP **200** de `https://api.web3forms.com/submit`; painel de sucesso exibido, botão
+  "Pedido enviado" e formulário limpo.
+- O assunto gerado foi `Novo pedido de orçamento — Ensaios — Teste Site Faby` e `consent_at`
+  recebeu `2026-10-25T20:32:31.793Z`.
+- Nenhum e-mail foi gerado nas tentativas anteriores que falharam antes de chegar à API.
+
+**Observação de teste**: o Web3Forms recusa o preflight CORS quando o `User-Agent` contém
+`HeadlessChrome`. A validação real exigiu sobrescrever o UA do Playwright para um Chrome comum. Isso
+não afeta visitantes reais; qualquer automação futura que envie de verdade precisa do mesmo ajuste.
+
+**Resultado**: ✅ mensagem recebida e conferida em 2026-10-25 — cinco campos presentes,
+`consentimento: sim`, versão `2026-10-25`, data/hora e "Responder" para `teste.site@exemplo.com`.
+A mensagem de teste foi apagada da caixa.
+
+## Pendências desta feature
+
+1. **Restrição de domínio no Web3Forms** — autorizar `juninhofonseca.github.io` no painel.
+2. **Variável de deploy** — cadastrar `WEB3FORMS_KEY` no repositório e validar o envio na URL
+   publicada.
