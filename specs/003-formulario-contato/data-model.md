@@ -61,7 +61,7 @@ redação sem efeito prático não exigem nova versão.
 |---|---|---|
 | Chave `PUBLIC_WEB3FORMS_KEY` | `.env` local e variável `WEB3FORMS_KEY` no GitHub | Não |
 | E-mail de destino | painel do Web3Forms (conta criada com o endereço) | Não |
-| Domínio autorizado | painel do Web3Forms | Não |
+| Domínio autorizado (PRO, opcional) | painel do Web3Forms | Não |
 | Endpoint | constante no código | Sim |
 | E-mail e WhatsApp públicos | `src/lib/contact.ts` | Sim |
 

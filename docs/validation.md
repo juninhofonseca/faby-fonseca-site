@@ -224,11 +224,10 @@ Revisão item por item do checklist de [plan.md](../specs/003-formulario-contato
 | P11 | Sem dados no cliente | ✅ | Teste E2E verifica `localStorage`, `sessionStorage`, cookies e URL vazios |
 | P12 | Sem rastreamento | ✅ | Nenhum analytics, pixel, cookie ou script externo no `dist/` |
 | P13 | Segurança do canal | ✅ | GitHub Pages força HTTPS; acesso à caixa restrito à responsável |
-| P14 | Serviço adequado | ⏳ | Depende de restringir o domínio no painel do Web3Forms (passo manual) |
+| P14 | Serviço adequado | ✅ | Web3Forms atua só como operador de envio; a restrição de domínio é recurso PRO e não está disponível no plano gratuito — mitigada por honeypot, tempo mínimo e rotação de chave |
 | P15 | Dados de teste | ✅ | Envio real com dados fictícios recebido e conferido; mensagem de teste apagada |
 
-Itens P14 e P15 são manuais e dependem da chave real; o resultado é registrado na seção de
-validação manual abaixo.
+P14 e P15 dependiam da chave real e foram verificados manualmente (seção abaixo).
 
 ## Verificação de dados sensíveis
 
@@ -284,6 +283,6 @@ A mensagem de teste foi apagada da caixa.
 ## Pendências desta feature
 
 1. **Mensagem de teste do deploy** — apagar o e-mail "Teste Deploy Faby" da caixa.
-2. **Restrição de domínio no Web3Forms** (recomendado) — autorizar `juninhofonseca.github.io` no
-   painel. A chave é pública e só envia para o e-mail cadastrado; a restrição reduz uso indevido se
-   a chave for copiada para outro site.
+2. **Restrição de domínio (opcional)** — o recurso **Restrict to Domain** do Web3Forms é exclusivo
+   do plano PRO. No plano gratuito, a mitigação é monitorar o painel e rotacionar a chave se houver
+   spam. A chave é pública e só envia para o e-mail cadastrado.

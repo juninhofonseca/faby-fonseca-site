@@ -23,8 +23,8 @@ uma chamada HTTP simples (sem SDK), há painel para reenviar mensagens perdidas 
 não tira o visitante da página. O mailto foi descartado por perder o contato quando não há cliente
 de e-mail configurado, o que é comum no celular.
 
-**Configuração necessária fora do repositório**: conta criada com o e-mail de destino, chave de
-acesso e restrição de domínio no painel do Web3Forms.
+**Configuração necessária fora do repositório**: conta criada com o e-mail de destino e chave de
+acesso. A restrição de domínio do Web3Forms é recurso PRO e fica fora do escopo do plano gratuito.
 
 ## D2. Transporte do envio
 
@@ -55,7 +55,8 @@ qualquer site que usa o serviço e só permite enviar mensagens para o endereço
 a limite e filtro de spam. Ainda assim:
 
 - nenhuma chave real é versionada (apenas a referência à variável);
-- o painel do Web3Forms deve ter o domínio do site autorizado, para reduzir uso indevido;
+- a restrição de domínio do painel é recurso PRO; no plano gratuito valem honeypot, tempo mínimo e
+  filtro antispam do serviço;
 - se a chave vazar e virar fonte de spam, ela é rotacionada no painel sem alteração de código.
 
 Quando a chave estiver ausente no build, a página entra em **modo de contato direto**: mostra

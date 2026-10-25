@@ -63,9 +63,9 @@ nenhuma chave real versionada; identidade visual ainda provisória (tokens CSS).
 **Reavaliação pós-Fase 1**: todos os portões continuam atendidos. Dois pontos ficam registrados:
 
 - **Chave no cliente**: `PUBLIC_WEB3FORMS_KEY` fica visível no HTML por natureza do serviço (é uma
-  chave de envio, não uma credencial de acesso). Mitigações: nenhuma chave no repositório,
-  restrição de domínio no painel e rotação fácil. A ausência da chave desliga o formulário em vez
-  de expor um envio quebrado.
+  chave de envio, não uma credencial de acesso). Mitigações: nenhuma chave no repositório, honeypot,
+  tempo mínimo e rotação fácil. A restrição de domínio do Web3Forms é recurso PRO, indisponível no
+  plano gratuito. A ausência da chave desliga o formulário em vez de expor um envio quebrado.
 - **Consentimento sem banco**: o registro do consentimento vive no e-mail recebido
   (`consent`, `consent_version`, `consent_at`), única cópia dos dados. A política declara esse
   modelo e o prazo de retenção.
@@ -91,7 +91,7 @@ Exigido pelo Princípio VII para funcionalidades que coletam dados pessoais.
 | P11 | Sem dados no cliente | Nada em URL, `localStorage`, `sessionStorage`, cookies ou logs | Teste E2E |
 | P12 | Sem rastreamento | Nenhum analytics, pixel ou cookie; declarado na política | Inspeção de rede no teste |
 | P13 | Segurança do canal | HTTPS no GitHub Pages; acesso ao e-mail restrito à Faby | Configuração de deploy |
-| P14 | Serviço adequado | Web3Forms usado como operador, com domínio restrito no painel | Configuração manual (quickstart) |
+| P14 | Serviço adequado | Web3Forms usado como operador; restrição de domínio é PRO e não se aplica ao plano gratuito | Configuração manual (quickstart) |
 | P15 | Dados de teste | Envios de teste usam dados fictícios e são apagados | Quickstart, cenário 5 |
 
 ## Estrutura do Projeto
@@ -196,8 +196,8 @@ JavaScript.
 | Risco | Impacto | Mitigação |
 |---|---|---|
 | Limite de 250 envios/mês atingido | Pedidos perdidos no fim do mês | Mensagem de erro com contato direto; monitorar pelo painel; upgrade só se necessário |
-| Spam apesar do honeypot | Caixa poluída | Tempo mínimo, `botcheck`, restrição de domínio; hCaptcha fica como alternativa documentada |
-| Chave exposta e usada por terceiros | Spam com o domínio da Faby | Restrição de domínio no painel e rotação da chave |
+| Spam apesar do honeypot | Caixa poluída | Tempo mínimo, `botcheck`, filtro antispam do serviço; hCaptcha fica como alternativa documentada |
+| Chave exposta e usada por terceiros | Spam com o domínio da Faby | Rotação da chave (restrição de domínio é recurso PRO, fora do plano gratuito) |
 | E-mail entregue em spam | Pedido não visto | `from_name` identificável, `replyto` correto; orientação para marcar como confiável |
 | Visitante sem JS e redirecionamento falha | Acha que não enviou | `redirect` para `/contato/enviado/` no mesmo domínio (exigência do plano gratuito) |
 | Mensagem longa quebra o e-mail | Dificulta a leitura | Limite de 1000 caracteres com contador visível |

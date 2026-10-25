@@ -89,8 +89,9 @@ CI não depende da chave real.
    variable**.
 2. Nome `WEB3FORMS_KEY`, valor igual à chave do Web3Forms.
 3. Rode o workflow **Deploy** (push em `main` ou `workflow_dispatch`).
-4. No painel do Web3Forms, restrinja o domínio para `juninhofonseca.github.io` (ou o domínio
-   próprio, quando existir).
+4. Opcional, apenas no plano **PRO**: ative **Restrict to Domain** no painel do Web3Forms e
+   cadastre `juninhofonseca.github.io` (sem `https://`); ao ativar o domínio próprio, acrescente
+   `fabyfonseca.com.br`. Depois disso o formulário deixa de funcionar em `localhost`.
 5. Faça um envio real a partir do site publicado e confirme a chegada do e-mail.
 
 ## 8. Critérios de aceite da validação

@@ -94,9 +94,17 @@ O honeypot e o tempo mínimo resolvem a maior parte dos robôs simples. Vale adi
 - picos de envio que consomem o limite mensal.
 
 Antes de ativar, lembre que o hCaptcha adiciona um script de terceiros e uma etapa para o visitante:
-isso afeta desempenho, privacidade e a política de privacidade, que precisa ser atualizada. A
-alternativa mais barata é restringir o domínio no painel do Web3Forms e, se necessário, rotacionar
-a chave.
+isso afeta desempenho, privacidade e a política de privacidade, que precisa ser atualizada.
+
+### Sobre restringir o domínio
+
+A opção **Restrict to Domain** do Web3Forms (aceitar envios só de domínios autorizados) é um
+**recurso PRO, pago** — não existe no plano gratuito. No plano gratuito, as proteções efetivas são
+o honeypot, o tempo mínimo, o filtro antispam do próprio serviço e a rotação da chave:
+
+- monitore o painel de envios e o consumo mensal;
+- se aparecer spam, gere uma nova chave no painel, atualize o `.env` local e a variável
+  `WEB3FORMS_KEY` no GitHub, e faça um novo deploy. A chave antiga para de funcionar na hora.
 
 ## Se o formulário sumir da página
 
@@ -109,6 +117,9 @@ Se o formulário desaparecer depois de um deploy, confira:
 1. A variável `WEB3FORMS_KEY` existe em **Settings → Secrets and variables → Actions → Variables**
    no GitHub (nome exato, sem `PUBLIC_`).
 2. O workflow **Deploy** rodou depois da variável ser criada.
-3. No painel do Web3Forms, o domínio `juninhofonseca.github.io` está autorizado.
+3. O valor da variável não está vazio nem com espaços.
+
+Se o formulário aparece mas o envio falha, verifique no painel do Web3Forms se a chave está ativa e
+se o limite de 250 envios do mês não foi atingido.
 
 O passo a passo técnico está no [README](../README.md#formulário-de-contato).
