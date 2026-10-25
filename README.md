@@ -61,6 +61,10 @@ O deploy é feito pelo workflow `.github/workflows/deploy.yml` a cada push em `m
 2. Confirme o domínio em `astro.config.mjs` (`site`).
 3. Se usar domínio próprio, configure o DNS e o certificado no GitHub Pages.
 
+Enquanto o domínio próprio não estiver apontado, o workflow compila com `SITE_URL` e `SITE_BASE`
+para publicar em `https://juninhofonseca.github.io/faby-fonseca-site/`. Ao ativar o domínio,
+remova essas variáveis do workflow e o site passa a usar `https://fabyfonseca.com.br` na raiz.
+
 O repositório precisa ser público para usar o Pages e o Pages CMS no plano gratuito.
 
 ## Gestão de conteúdo

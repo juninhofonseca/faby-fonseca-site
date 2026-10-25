@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../lib/urls';
 ---
 
 <BaseLayout
@@ -12,6 +13,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       Casamentos, ensaios, família, newborn e eventos. Histórias reais registradas
       com sensibilidade e cuidado.
     </p>
-    <a class="button" href="/portfolio/">Ver portfólio</a>
+    <a class="button" href={withBase('/portfolio/')}>Ver portfólio</a>
   </section>
 </BaseLayout>

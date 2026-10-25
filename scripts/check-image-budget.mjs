@@ -13,7 +13,20 @@ import {
 const root = process.cwd();
 const originalsDir = path.join(root, 'content', 'photos', 'images');
 const distDir = path.join(root, 'dist');
+const basePrefix =
+  process.env.SITE_BASE && process.env.SITE_BASE !== '/'
+    ? process.env.SITE_BASE.replace(/\/$/, '')
+    : '';
 const errors = [];
+
+/** Converte a URL pública da variante no caminho do arquivo dentro de `dist/`. */
+function assetPathFor(url) {
+  const withoutBase =
+    basePrefix && url.startsWith(`${basePrefix}/`)
+      ? url.slice(basePrefix.length)
+      : url;
+  return path.join(distDir, withoutBase.replace(/^\/+/, ''));
+}
 
 async function walk(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
@@ -65,7 +78,7 @@ try {
       for (const entry of parseSrcSet(match[1])) {
         if (!isGridVariant(entry) || /^https?:\/\//.test(entry.url)) continue;
 
-        const assetPath = path.join(distDir, entry.url.replace(/^\//, ''));
+        const assetPath = assetPathFor(entry.url);
         if (checked.has(assetPath)) continue;
         checked.add(assetPath);
 

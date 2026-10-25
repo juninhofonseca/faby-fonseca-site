@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { withBase } from '../lib/urls';
 
 interface Props {
   title: string;
@@ -22,6 +23,7 @@ const canonical = Astro.site
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <meta name="app-base" content={import.meta.env.BASE_URL} />
     <link rel="canonical" href={canonical} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -44,12 +46,12 @@ const canonical = Astro.site
 
     <header class="site-header">
       <div class="container site-header__inner">
-        <a class="site-brand" href="/">Faby Fonseca Fotografia</a>
+        <a class="site-brand" href={withBase('/')}>Faby Fonseca Fotografia</a>
         <nav class="site-nav" aria-label="Navegação principal">
           <ul role="list">
-            <li><a href="/">Início</a></li>
-            <li><a href="/portfolio/">Portfólio</a></li>
-            <li><a href="/contato/">Contato</a></li>
+            <li><a href={withBase('/')}>Início</a></li>
+            <li><a href={withBase('/portfolio/')}>Portfólio</a></li>
+            <li><a href={withBase('/contato/')}>Contato</a></li>
           </ul>
         </nav>
       </div>

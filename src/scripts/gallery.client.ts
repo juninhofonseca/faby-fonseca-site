@@ -6,6 +6,8 @@ const sections = Array.from(
 );
 const budgetCta =
   document.querySelector<HTMLAnchorElement>('[data-budget-cta]');
+const baseMeta = document.querySelector<HTMLMetaElement>('meta[name="app-base"]');
+const appBase = (baseMeta?.content ?? '/').replace(/\/$/, '');
 
 function activate(slug: string, updateUrl = true): void {
   const target = sections.find(
@@ -30,7 +32,7 @@ function activate(slug: string, updateUrl = true): void {
   }
 
   if (budgetCta) {
-    budgetCta.href = `/contato/?categoria=${slug}`;
+    budgetCta.href = `${appBase}/contato/?categoria=${slug}`;
   }
 
   if (updateUrl) {

@@ -35,6 +35,11 @@ jobs:
 
       - name: Build and check image budget
         run: npm run build
+        env:
+          # Publicação temporária na URL de projeto do GitHub Pages.
+          # Ao ativar o domínio próprio, remova estas duas variáveis.
+          SITE_URL: https://juninhofonseca.github.io
+          SITE_BASE: /faby-fonseca-site
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

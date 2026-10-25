@@ -1,5 +1,6 @@
 ---
 import type { Category } from '../lib/categories';
+import { withBase } from '../lib/urls';
 
 interface Props {
   category?: Category;
@@ -13,7 +14,7 @@ const { category } = Astro.props;
     <p class="budget-cta">
       <a
         class="button"
-        href={`/contato/?categoria=${category.data.slug}`}
+        href={withBase(`/contato/?categoria=${category.data.slug}`)}
         data-budget-cta
       >
         Quero um orçamento desta categoria

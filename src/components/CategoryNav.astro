@@ -1,5 +1,6 @@
 ---
 import type { Category } from '../lib/categories';
+import { withBase } from '../lib/urls';
 
 interface Props {
   categories: Category[];
@@ -17,7 +18,7 @@ const { categories, activeSlug } = Astro.props;
         return (
           <li>
             <a
-              href={`/portfolio/?categoria=${category.data.slug}`}
+              href={withBase(`/portfolio/?categoria=${category.data.slug}`)}
               class:list={['category-link', { 'is-active': isActive }]}
               aria-current={isActive ? 'page' : undefined}
               data-category-link={category.data.slug}
