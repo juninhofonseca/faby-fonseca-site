@@ -144,8 +144,8 @@ qualquer história.
 - [X] T045 Rodar `npm run test:lighthouse` e confirmar desempenho ≥ 90 e acessibilidade 100 em `/contato/` e `/privacidade/`
 - [X] T046 Revisar o Checklist de Privacidade e LGPD de `plan.md` item por item e registrar o resultado em `docs/validation.md`
 - [X] T047 Confirmar que nenhum dado pessoal, chave ou token aparece em `git status`, `git diff` ou nos arquivos versionados
-- [ ] T048 Configurar a variável `WEB3FORMS_KEY` no repositório, rodar o deploy e validar um envio real na URL publicada
-- [ ] T049 Registrar em `docs/validation.md` os resultados da suíte automatizada, do envio real e do deploy, e listar o que ficou pendente
+- [X] T048 Configurar a variável `WEB3FORMS_KEY` no repositório, rodar o deploy e validar um envio real na URL publicada
+- [X] T049 Registrar em `docs/validation.md` os resultados da suíte automatizada, do envio real e do deploy, e listar o que ficou pendente
 
 ---
 

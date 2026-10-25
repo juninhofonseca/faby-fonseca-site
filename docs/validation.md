@@ -261,8 +261,29 @@ não afeta visitantes reais; qualquer automação futura que envie de verdade pr
 `consentimento: sim`, versão `2026-10-25`, data/hora e "Responder" para `teste.site@exemplo.com`.
 A mensagem de teste foi apagada da caixa.
 
+## Deploy de produção
+
+- URL publicada: **https://juninhofonseca.github.io/faby-fonseca-site/**
+- Commit publicado: `53883ff` (`feat: formulário de contato com envio e LGPD (003)`).
+- Workflow **Deploy** (run 40231689659) concluído com sucesso, com a variável de repositório
+  `WEB3FORMS_KEY` injetada como `PUBLIC_WEB3FORMS_KEY` no build.
+- Verificado no site publicado:
+  - `/contato/` responde 200 e renderiza o formulário completo com a chave real no campo oculto
+    `access_key`;
+  - `/privacidade/` responde 200 com as 11 seções, Web3Forms, ausência de cookies, e-mail e
+    WhatsApp;
+  - `/contato/enviado/` responde 200 e traz `noindex`;
+  - o rodapé das três páginas linka a política de privacidade.
+- **Envio real na URL publicada**: dados fictícios ("Teste Deploy Faby", categoria Casamentos),
+  resposta HTTP **200** com `success: true`, painel de sucesso visível, sem erros de console.
+  Assunto gerado: `Novo pedido de orçamento — Casamentos — Teste Deploy Faby`;
+  `consent_at` = `2026-10-25T20:39:11.458Z`.
+- Workflow **CI** (run 40231689658) concluído com sucesso no mesmo commit: conteúdo, testes
+  unitários, `build:test`, 70 testes E2E (desktop + mobile, incluindo axe) e Lighthouse.
+
 ## Pendências desta feature
 
-1. **Restrição de domínio no Web3Forms** — autorizar `juninhofonseca.github.io` no painel.
-2. **Variável de deploy** — cadastrar `WEB3FORMS_KEY` no repositório e validar o envio na URL
-   publicada.
+1. **Mensagem de teste do deploy** — apagar o e-mail "Teste Deploy Faby" da caixa.
+2. **Restrição de domínio no Web3Forms** (recomendado) — autorizar `juninhofonseca.github.io` no
+   painel. A chave é pública e só envia para o e-mail cadastrado; a restrição reduz uso indevido se
+   a chave for copiada para outro site.
