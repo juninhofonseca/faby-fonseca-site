@@ -13,6 +13,11 @@ export const WHATSAPP_NUMBER = '5511967458235';
 export const WHATSAPP_MESSAGE =
   'Olá, Faby! Vim pelo site e gostaria de um orçamento.';
 
+/** Perfil público do Instagram, usado na home e no rodapé. */
+export const INSTAGRAM_HANDLE = 'faby.fonseca.fotografia';
+
+export const INSTAGRAM_URL = `https://www.instagram.com/${INSTAGRAM_HANDLE}/`;
+
 /** Versão do aviso de privacidade aceito no consentimento (ISO AAAA-MM-DD). */
 export const PRIVACY_VERSION = '2026-10-25';
 

@@ -289,3 +289,154 @@ Nenhuma pendência bloqueante: a feature está publicada, validada e sem dados d
 1. **Restrição de domínio (opcional)** — o recurso **Restrict to Domain** do Web3Forms é exclusivo
    do plano PRO. No plano gratuito, a mitigação é monitorar o painel e rotacionar a chave se houver
    spam. A chave é pública e só envia para o e-mail cadastrado.
+
+---
+
+# Validação — Home com Foto de Destaque e Instagram
+
+**Feature**: `004-home-destaque` | **Data**: 2026-10-25
+**Ambiente**: Windows 11, Node.js v24.19.0, npm 11.17.0, Astro 7.4.2, Chromium (Playwright)
+
+Resultados dos cenários de [quickstart.md](../specs/004-home-destaque/quickstart.md) e da suíte
+automatizada. A foto de destaque é um placeholder declarado como tal no texto alternativo.
+
+## Resumo
+
+| Verificação | Comando | Resultado |
+|---|---|---|
+| Conteúdo (categorias, fotos, home, alt, imagens) | `npm run validate:content` | ✅ 5 categorias, 6 fotos e home válidas |
+| Regras de conteúdo (unitárias) | `npm run test:content` | ✅ 13/13 (5 casos novos de categorias em destaque) |
+| Tipos e Astro | `npm run check` | ✅ 0 erros, 0 avisos, 0 dicas (41 arquivos) |
+| Build + orçamento de imagens | `npm run build` | ✅ 5 páginas; 20 variantes de grade ≤ 300 KB |
+| E2E + acessibilidade (desktop e mobile) | `npm run test:e2e` | ✅ 94/94 (24 novos: 11 da home × 2 viewports + axe da home × 2) |
+| Lighthouse CI (mobile, 4G simulado) | `npm run test:lighthouse` | ✅ 4 rotas aprovadas |
+
+Rotas geradas: `/`, `/portfolio/`, `/contato/`, `/contato/enviado/`, `/privacidade/`.
+
+## Resultados do Lighthouse
+
+| Rota | Performance | Acessibilidade | Boas práticas | SEO | LCP | CLS | TBT |
+|---|---|---|---|---|---|---|---|
+| `/` | 100 | 100 | 96 | 100 | 0,90 s | 0 | 0 ms |
+| `/portfolio/` | 100 | 100 | 96 | 100 | 0,90 s | 0 | 0 ms |
+| `/contato/` | 100 | 100 | 96 | 100 | 0,90 s | 0 | 0 ms |
+| `/privacidade/` | 100 | 100 | 96 | 100 | 0,90 s | 0 | 0 ms |
+
+As asserções de `.lighthouserc.json` (acessibilidade 100, LCP < 3 s, CLS < 0,1) passaram nas quatro
+rotas. A home não carrega JavaScript próprio nem de terceiros.
+
+## Cenário 1 — Primeira impressão e conversão
+
+- A home apresenta um único `h1` com o título do destaque, a frase de apresentação e a foto com
+  `alt` ("Foto provisória...").
+- A foto usa `loading="eager"`, `fetchpriority="high"`, dimensões explícitas e `srcset` com 480, 800,
+  1200 e 1600 px; no desktop de 1280 px ela renderiza 591 × 394 px ao lado do texto, sem CLS.
+- "Ver portfólio" leva a `/portfolio/` e "Solicitar orçamento" a `/contato/`; a chamada final repete
+  o caminho de orçamento.
+- `title` e `description` são próprios da home e não repetem o texto do portfólio.
+
+**Resultado**: ✅ aprovado (`tests/e2e/home.spec.ts`).
+
+## Cenário 2 — Categorias em destaque
+
+- Exatamente três cartões, na ordem do conteúdo: Casamentos, Ensaios e Família.
+- Hrefs corretos: `/portfolio/?categoria=casamentos`, `=ensaios` e `=familia`; ao clicar, a categoria
+  abre já ativa (`aria-current="page"`).
+- Cada cartão é um link único, com `h3`, descrição e "Ver trabalhos".
+- As miniaturas usam a primeira foto publicada de cada categoria, com `loading="lazy"`, `srcset` de
+  400 e 800 px e o `alt` cadastrado na foto.
+- Categoria sem fotos renderiza o cartão apenas com texto (coberto por `gallery.spec.ts` e pelo
+  fallback de `resolveFeaturedCategories`).
+
+**Resultado**: ✅ aprovado.
+
+## Cenário 3 — Apresentação e Instagram
+
+- A seção "Sobre a Faby" lê `aboutTitle` e `aboutText` do conteúdo e divide o texto em dois
+  parágrafos pelas linhas em branco.
+- O link `@faby.fonseca.fotografia` abre `https://www.instagram.com/faby.fonseca.fotografia/` em nova
+  aba com `rel="noopener noreferrer"`.
+- O mesmo link aparece no rodapé de `/`, `/portfolio/` e `/contato/`.
+- Não há `iframe` nem `script` do Instagram na página (verificado no E2E).
+
+**Resultado**: ✅ aprovado.
+
+## Cenário 4 — Editar a home pelo Pages CMS
+
+- `.pages.yml` ganhou a fonte de mídia `home` (`content/home/images` → `images`, `rename: safe`,
+  extensões de imagem) e o arquivo único `home` (`content/home/index.md`, `yaml-frontmatter`) com os
+  sete campos do contrato, rótulos em português e `reference` múltipla para as categorias.
+- O contrato está em
+  [`contracts/home-content.md`](../specs/004-home-destaque/contracts/home-content.md) e o passo a
+  passo em [admin.md](./admin.md).
+- **Pendência manual**: a edição real no painel (trocar foto, textos e ordem das categorias,
+  publicar e conferir o deploy) depende de acesso ao Pages CMS e não foi executada nesta sessão. A
+  configuração foi validada por build local com o mesmo formato que o painel grava.
+
+**Resultado**: ⏳ configuração validada; verificação no painel pendente (T023).
+
+## Cenário 5 — Desempenho e orçamento de imagens
+
+- `npm run build` gera 5 páginas e `check-image-budget` verifica os originais de
+  `content/photos/images/` **e** de `content/home/images/`, além de 20 variantes de grade (480, 800,
+  1200 e 1600 px do destaque; 400 e 800 px das três miniaturas) abaixo de 300 KB.
+- O placeholder tem 23 KB, bem abaixo do limite de 10 MB por original.
+- Lighthouse mobile com throttling 4G: LCP 0,9 s, CLS 0, TBT 0 ms, Performance 100.
+- A foto de destaque é a única imagem prioritária; as miniaturas carregam sob demanda.
+
+**Resultado**: ✅ aprovado.
+
+## Cenário 6 — Acessibilidade e responsividade
+
+- axe-core (tags `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`) em `/`, desktop e mobile: 0 violações.
+- Hierarquia: um `h1`, três `h2` de seção e `h3` nos cartões.
+- Ordem de foco conferida manualmente a 360 px: link "Pular para o conteúdo" → marca → navegação
+  (Início, Portfólio, Contato) → "Ver portfólio" → "Solicitar orçamento" → três cartões → Instagram
+  → "Solicitar orçamento" final → links do rodapé.
+- Alvos de toque: os links do rodapé foram ajustados para `inline-flex` com
+  `min-height: var(--target-min)`, corrigindo a altura de 20 px observada na inspeção.
+- Nenhuma rolagem horizontal em 360, 768 e 1280 px (teste E2E com medição de `scrollWidth`).
+- A página funciona com JavaScript desabilitado: título, foto, três categorias, apresentação,
+  Instagram e chamadas continuam visíveis.
+
+**Resultado**: ✅ aprovado nos testes automatizados e na inspeção manual de foco; leitor de tela e
+dispositivo físico seguem como verificação manual recomendada.
+
+## Recusas de validação comprovadas
+
+Testes descartáveis com o conteúdo editado e restaurado em seguida (`validate:content` voltou a
+passar):
+
+| Alteração | Mensagem |
+|---|---|
+| Slug de destaque inexistente (`nao-existe`) | `Categoria em destaque inexistente ou inativa: "nao-existe".` |
+| Foto de destaque apontando para arquivo ausente | `content\home\images\nao-existe.jpg: arquivo de imagem não encontrado.` |
+
+Ambas interrompem o build com `exit=1`, portanto o deploy não publica uma home inválida e o site
+anterior continua no ar.
+
+## Cobertura automatizada da home
+
+`tests/e2e/home.spec.ts` (11 casos × desktop e mobile) e `tests/a11y/home.spec.ts`:
+
+- Destaque com `h1`, frase, metadados e os três CTAs.
+- Foto com `alt`, dimensões, `loading="eager"`, `fetchpriority="high"` e `srcset` de 480w.
+- Exatamente três cartões, na ordem, com hrefs, `h3`, descrição e "Ver trabalhos".
+- Navegação do cartão para a categoria correta já ativa no portfólio.
+- Miniaturas `lazy` com `alt` preenchido.
+- Seção sobre a Faby com dois parágrafos.
+- Instagram na home e no rodapé de três rotas, com `target` e `rel` corretos.
+- Ausência de `iframe` e de script do Instagram.
+- Hierarquia de títulos e todas as imagens do `main` com `alt`.
+- Sem rolagem horizontal em 360, 768 e 1280 px.
+- Funcionamento sem JavaScript.
+- axe-core sem violações em `/`.
+
+## Pendências desta feature
+
+1. **Edição real pelo Pages CMS (T023)** — executar o cenário 4 do quickstart quando houver acesso ao
+   painel: trocar a foto e o texto alternativo, ajustar textos, reordenar as três categorias,
+   publicar, conferir o deploy e reverter a foto de teste.
+2. **Foto definitiva da Faby** — o placeholder atual (amostra da cerimônia) deve ser substituído pela
+   foto real pelo painel, atualizando o texto alternativo junto.
+3. **Identidade visual e domínio próprio** — continuam provisórios, como nas features anteriores.

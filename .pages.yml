@@ -6,7 +6,58 @@ media:
     rename: safe
     extensions: [jpg, jpeg, png, webp]
 
+  - name: home
+    label: Foto da página inicial
+    input: content/home/images
+    output: images
+    rename: safe
+    extensions: [jpg, jpeg, png, webp]
+
 content:
+  - name: home
+    label: Página inicial
+    type: file
+    path: content/home/index.md
+    format: yaml-frontmatter
+    fields:
+      - name: heroTitle
+        label: Título do destaque
+        type: string
+        description: Aparece como título principal da home. Até 80 caracteres.
+      - name: heroText
+        label: Frase de apresentação
+        type: text
+        description: Resume o trabalho em uma ou duas frases. Até 240 caracteres.
+      - name: heroImage
+        label: Foto de destaque
+        type: image
+        options:
+          media: home
+      - name: heroAlt
+        label: Texto alternativo da foto
+        type: string
+        description: Descreva a foto para quem não pode vê-la. Até 160 caracteres.
+      - name: featuredCategories
+        label: Categorias em destaque
+        type: reference
+        options:
+          collection: categories
+          multiple: true
+          min: 3
+          max: 3
+          value: "{fields.slug}"
+          label: "{fields.name}"
+          search: "fields.name"
+        description: Escolha exatamente três categorias ativas, na ordem em que devem aparecer.
+      - name: aboutTitle
+        label: Título da seção sobre a Faby
+        type: string
+        description: Até 60 caracteres.
+      - name: aboutText
+        label: Texto sobre a Faby
+        type: text
+        description: Até 600 caracteres. Deixe uma linha em branco entre parágrafos.
+
   - name: categories
     label: Categorias
     type: collection

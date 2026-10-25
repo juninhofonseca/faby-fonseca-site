@@ -5,6 +5,7 @@ import {
   MAX_ORIGINAL_BYTES,
   assertAlt,
   assertCategory,
+  assertFeaturedCategories,
   exceedsGridBudget,
   exceedsLimit,
   findDuplicateSlugs,
@@ -64,4 +65,63 @@ test('interpreta srcset e identifica variantes de grade', () => {
 test('rejeita variante de grade acima de 300 KB', () => {
   assert.equal(exceedsGridBudget(MAX_GRID_BYTES + 1), true);
   assert.equal(exceedsGridBudget(MAX_GRID_BYTES), false);
+});
+
+test('aceita três categorias em destaque ativas e distintas', () => {
+  const featured = ['casamentos', 'ensaios', 'familia'];
+
+  assert.deepEqual(
+    assertFeaturedCategories(featured, [
+      'casamentos',
+      'ensaios',
+      'familia',
+      'newborn',
+      'eventos',
+    ]),
+    featured,
+  );
+});
+
+test('rejeita quantidade diferente de três categorias em destaque', () => {
+  assert.throws(
+    () => assertFeaturedCategories(['casamentos', 'ensaios'], ['casamentos', 'ensaios']),
+    /exatamente 3/,
+  );
+  assert.throws(
+    () => assertFeaturedCategories([], []),
+    /exatamente 3/,
+  );
+});
+
+test('rejeita categoria em destaque repetida', () => {
+  assert.throws(
+    () =>
+      assertFeaturedCategories(
+        ['casamentos', 'ensaios', 'casamentos'],
+        ['casamentos', 'ensaios', 'familia'],
+      ),
+    /repetir/,
+  );
+});
+
+test('rejeita categoria em destaque inexistente ou inativa', () => {
+  assert.throws(
+    () =>
+      assertFeaturedCategories(
+        ['casamentos', 'ensaios', 'newborn'],
+        ['casamentos', 'ensaios', 'familia'],
+      ),
+    /inexistente ou inativa/,
+  );
+});
+
+test('rejeita slug inválido em categoria em destaque', () => {
+  assert.throws(
+    () =>
+      assertFeaturedCategories(
+        ['casamentos', 'ensaios', 'Família'],
+        ['casamentos', 'ensaios', 'familia'],
+      ),
+    /slugs válidos/,
+  );
 });

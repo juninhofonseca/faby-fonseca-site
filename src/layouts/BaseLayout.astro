@@ -1,7 +1,12 @@
 ---
 import '../styles/global.css';
 import { withBase } from '../lib/urls';
-import { CONTACT_EMAIL, buildMailtoHref, buildWhatsappHref } from '../lib/contact';
+import {
+  CONTACT_EMAIL,
+  INSTAGRAM_URL,
+  buildMailtoHref,
+  buildWhatsappHref,
+} from '../lib/contact';
 
 interface Props {
   title: string;
@@ -75,6 +80,16 @@ const canonical = Astro.site
           <li>
             <a href={buildWhatsappHref()} target="_blank" rel="noopener noreferrer">
               WhatsApp
+            </a>
+          </li>
+          <li>
+            <a
+              href={INSTAGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-footer-instagram
+            >
+              Instagram
             </a>
           </li>
           <li>

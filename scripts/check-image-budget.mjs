@@ -11,7 +11,10 @@ import {
 } from './content-rules.mjs';
 
 const root = process.cwd();
-const originalsDir = path.join(root, 'content', 'photos', 'images');
+const originalsDirs = [
+  path.join(root, 'content', 'photos', 'images'),
+  path.join(root, 'content', 'home', 'images'),
+];
 const distDir = path.join(root, 'dist');
 const basePrefix =
   process.env.SITE_BASE && process.env.SITE_BASE !== '/'
@@ -44,26 +47,30 @@ async function walk(directory) {
   return files;
 }
 
-try {
-  const originals = await walk(originalsDir);
+for (const originalsDir of originalsDirs) {
+  try {
+    const originals = await walk(originalsDir);
 
-  for (const file of originals) {
-    const relative = path.relative(root, file);
+    for (const file of originals) {
+      const relative = path.relative(root, file);
 
-    if (!isSupportedImage(file)) {
-      errors.push(`${relative}: formato não suportado (use jpg, jpeg, png ou webp).`);
-      continue;
+      if (!isSupportedImage(file)) {
+        errors.push(`${relative}: formato não suportado (use jpg, jpeg, png ou webp).`);
+        continue;
+      }
+
+      const info = await stat(file);
+      if (exceedsLimit(info.size, MAX_ORIGINAL_BYTES)) {
+        errors.push(
+          `${relative}: original acima de 10 MB (${formatBytes(info.size)}).`,
+        );
+      }
     }
-
-    const info = await stat(file);
-    if (exceedsLimit(info.size, MAX_ORIGINAL_BYTES)) {
-      errors.push(
-        `${relative}: original acima de 10 MB (${formatBytes(info.size)}).`,
-      );
-    }
+  } catch {
+    console.log(
+      `Nenhum original encontrado em ${path.relative(root, originalsDir)}.`,
+    );
   }
-} catch {
-  console.log('Nenhum original encontrado em content/photos/images.');
 }
 
 const checked = new Set();

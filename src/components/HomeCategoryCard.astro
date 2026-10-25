@@ -1,0 +1,40 @@
+---
+import { Image } from 'astro:assets';
+import type { Category } from '../lib/categories';
+import type { Photo } from '../lib/gallery';
+import { withBase } from '../lib/urls';
+
+interface Props {
+  category: Category;
+  photo?: Photo;
+}
+
+const { category, photo } = Astro.props;
+const { name, slug, description } = category.data;
+---
+
+<li class="home-category-card">
+  <a
+    class="home-category-card__link"
+    href={withBase(`/portfolio/?categoria=${slug}`)}
+    data-home-category={slug}
+  >
+    {
+      photo && (
+        <Image
+          src={photo.data.image}
+          alt={photo.data.alt}
+          widths={[400, 800]}
+          sizes="(max-width: 767px) 100vw, 33vw"
+          loading="lazy"
+          class="home-category-card__image"
+        />
+      )
+    }
+    <div class="home-category-card__body">
+      <h3>{name}</h3>
+      {description && <p class="home-category-card__description">{description}</p>}
+      <span class="home-category-card__cta">Ver trabalhos</span>
+    </div>
+  </a>
+</li>

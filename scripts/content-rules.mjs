@@ -31,6 +31,28 @@ export function assertCategory(category, validSlugs) {
   }
 }
 
+export function assertFeaturedCategories(featured, activeSlugs) {
+  if (!Array.isArray(featured) || featured.length !== 3) {
+    throw new Error('Escolha exatamente 3 categorias em destaque.');
+  }
+
+  if (featured.some((slug) => !isValidSlug(slug))) {
+    throw new Error('As categorias em destaque devem ser slugs válidos.');
+  }
+
+  if (new Set(featured).size !== featured.length) {
+    throw new Error('As categorias em destaque não podem se repetir.');
+  }
+
+  for (const slug of featured) {
+    if (!activeSlugs.includes(slug)) {
+      throw new Error(`Categoria em destaque inexistente ou inativa: "${slug}".`);
+    }
+  }
+
+  return featured;
+}
+
 export function exceedsLimit(bytes, limit) {
   return bytes > limit;
 }

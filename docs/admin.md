@@ -42,6 +42,38 @@ O site publicado é atualizado alguns minutos após cada publicação.
 - Mantenha o arquivo abaixo de **10 MB**.
 - O site gera automaticamente as versões otimizadas; você não precisa redimensionar para a web.
 
+## Editar a página inicial
+
+1. Abra **Página inicial** no menu do Pages CMS.
+2. Ajuste os campos:
+   - **Título do destaque**: a frase principal da home (até 80 caracteres).
+   - **Frase de apresentação**: resume o trabalho em uma ou duas frases (até 240 caracteres).
+   - **Foto de destaque**: envie o arquivo. A imagem fica em `content/home/images/`, separada das
+     fotos do portfólio.
+   - **Texto alternativo da foto**: descreva a **nova** foto para quem não pode vê-la (até 160
+     caracteres). Não deixe o texto da imagem anterior.
+   - **Categorias em destaque**: selecione exatamente **três** categorias ativas. A ordem dos
+     cartões na home é a ordem da seleção.
+   - **Título da seção sobre a Faby** e **Texto sobre a Faby**: a apresentação exibida depois das
+     categorias. Deixe uma linha em branco entre parágrafos.
+3. Publique e aguarde o workflow **Deploy** terminar.
+
+O link do Instagram (`@faby.fonseca.fotografia`) é público e fixo no site: aparece na home e no
+rodapé de todas as páginas. Para trocar o perfil, peça ao responsável técnico — é uma constante no
+código, não um campo do painel.
+
+### Erros comuns na página inicial
+
+| Mensagem | O que fazer |
+|---|---|
+| `Escolha exatamente 3 categorias em destaque` | Selecione três categorias, nem mais nem menos. |
+| `Categoria em destaque inexistente ou inativa` | Ative a categoria ou escolha outra que esteja ativa. |
+| `As categorias em destaque não podem se repetir` | Remova a categoria repetida. |
+| `"heroImage" é obrigatório` | Envie a foto de destaque novamente. |
+| `arquivo de imagem não encontrado` | Verifique se a foto foi enviada e publicada na mídia da home. |
+| `original acima de 10 MB` | Exporte a foto menor e envie novamente. |
+| `texto alternativo é obrigatório` | Preencha o texto alternativo da foto. |
+
 ## Reordenar
 
 Altere o campo **Ordem** das fotos ou categorias. Números menores aparecem primeiro. Use

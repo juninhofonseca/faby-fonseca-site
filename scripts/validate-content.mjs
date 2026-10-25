@@ -5,6 +5,7 @@ import {
   MAX_ORIGINAL_BYTES,
   assertAlt,
   assertCategory,
+  assertFeaturedCategories,
   exceedsLimit,
   findDuplicateSlugs,
   formatBytes,
@@ -15,6 +16,8 @@ import {
 const root = process.cwd();
 const categoriesDir = path.join(root, 'content', 'categories');
 const photosDir = path.join(root, 'content', 'photos');
+const homeDir = path.join(root, 'content', 'home');
+const homeFile = path.join(homeDir, 'index.md');
 const errors = [];
 
 async function listMarkdown(directory) {
@@ -23,6 +26,20 @@ async function listMarkdown(directory) {
   return entries
     .filter((entry) => entry.isFile() && entry.name.endsWith('.md'))
     .map((entry) => path.join(directory, entry.name));
+}
+
+function checkText(file, field, value, min, max) {
+  if (typeof value !== 'string' || value.trim().length < min) {
+    errors.push(`${file}: "${field}" é obrigatório.`);
+    return false;
+  }
+
+  if (value.length > max) {
+    errors.push(`${file}: "${field}" deve ter no máximo ${max} caracteres.`);
+    return false;
+  }
+
+  return true;
 }
 
 const categoryFiles = await listMarkdown(categoriesDir);
@@ -52,10 +69,14 @@ for (const file of categoryFiles) {
     errors.push(`${relative}: "description" deve ter no máximo 160 caracteres.`);
   }
 
-  categories.push({ slug: data.slug, file: relative });
+  categories.push({ slug: data.slug, active: data.active !== false, file: relative });
 }
 
 const validSlugs = categories.map((category) => category.slug).filter(Boolean);
+const activeSlugs = categories
+  .filter((category) => category.active)
+  .map((category) => category.slug)
+  .filter(Boolean);
 
 for (const duplicate of findDuplicateSlugs(validSlugs)) {
   errors.push(`Slug de categoria duplicado: "${duplicate}".`);
@@ -119,6 +140,50 @@ for (const file of photoFiles) {
   }
 }
 
+try {
+  const relative = path.relative(root, homeFile);
+  const { data: home } = matter(await readFile(homeFile, 'utf8'));
+
+  checkText(relative, 'heroTitle', home.heroTitle, 1, 80);
+  checkText(relative, 'heroText', home.heroText, 1, 240);
+  checkText(relative, 'heroAlt', home.heroAlt, 1, 160);
+  checkText(relative, 'aboutTitle', home.aboutTitle, 1, 60);
+  checkText(relative, 'aboutText', home.aboutText, 1, 600);
+
+  try {
+    assertFeaturedCategories(home.featuredCategories, activeSlugs);
+  } catch (error) {
+    errors.push(`${relative}: ${error.message}`);
+  }
+
+  if (typeof home.heroImage !== 'string' || home.heroImage.length === 0) {
+    errors.push(`${relative}: "heroImage" é obrigatório.`);
+  } else {
+    const imagePath = path.join(homeDir, home.heroImage);
+    const imageRelative = path.relative(root, imagePath);
+
+    if (!isSupportedImage(imagePath)) {
+      errors.push(
+        `${imageRelative}: formato não suportado (use jpg, jpeg, png ou webp).`,
+      );
+    } else {
+      try {
+        const info = await stat(imagePath);
+
+        if (exceedsLimit(info.size, MAX_ORIGINAL_BYTES)) {
+          errors.push(
+            `${imageRelative}: original acima de 10 MB (${formatBytes(info.size)}).`,
+          );
+        }
+      } catch {
+        errors.push(`${imageRelative}: arquivo de imagem não encontrado.`);
+      }
+    }
+  }
+} catch (error) {
+  errors.push(`${path.relative(root, homeFile)}: ${error.message}`);
+}
+
 if (errors.length > 0) {
   console.error('Falhas na validação do conteúdo:');
   for (const error of errors) console.error(`- ${error}`);
@@ -126,5 +191,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `Conteúdo válido: ${categories.length} categorias e ${photoCount} fotos.`,
+  `Conteúdo válido: ${categories.length} categorias, ${photoCount} fotos e home.`,
 );

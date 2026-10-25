@@ -1,7 +1,7 @@
 # Faby Fonseca Fotografia
 
-Site estático de portfólio fotográfico, com galeria por categoria, visualização ampliada
-acessível e formulário de orçamento com consentimento LGPD.
+Site estático de portfólio fotográfico, com página inicial editável, galeria por categoria,
+visualização ampliada acessível e formulário de orçamento com consentimento LGPD.
 
 ## Stack
 
@@ -46,14 +46,31 @@ O servidor local fica em `http://localhost:4321`.
 
 ```text
 content/
-├── categories/<slug>.md      # nome, slug, descrição, ordem, ativa
+├── home/
+│   ├── index.md               # destaque, três categorias, apresentação
+│   └── images/<arquivo>       # foto de destaque (separada do portfólio)
+├── categories/<slug>.md       # nome, slug, descrição, ordem, ativa
 └── photos/
-    ├── <slug>.md             # título, alt, imagem, categoria, ordem, data
-    └── images/<arquivo>      # originais enviados pela Faby
+    ├── <slug>.md              # título, alt, imagem, categoria, ordem, data
+    └── images/<arquivo>       # originais enviados pela Faby
 ```
 
 As regras completas estão em
-[`specs/002-portfolio-gallery/contracts/content-schema.md`](specs/002-portfolio-gallery/contracts/content-schema.md).
+[`specs/002-portfolio-gallery/contracts/content-schema.md`](specs/002-portfolio-gallery/contracts/content-schema.md)
+para o portfólio e em
+[`specs/004-home-destaque/contracts/home-content.md`](specs/004-home-destaque/contracts/home-content.md)
+para a página inicial.
+
+## Página inicial e Instagram
+
+A home lê `content/home/index.md` e é editável pelo Pages CMS como **Página inicial**: título e
+frase do destaque, foto e texto alternativo, três categorias em destaque e o texto sobre a Faby. A
+foto fica em `content/home/images/`, sem se misturar às fotos do portfólio. O passo a passo está em
+[`docs/admin.md`](docs/admin.md).
+
+O perfil público do Instagram é `@faby.fonseca.fotografia`, definido em `src/lib/contact.ts` e
+exibido na home e no rodapé de todas as páginas. Não há feed embutido, script de terceiros nem
+cookie. Para trocar o perfil, altere a constante nesse arquivo.
 
 ## Formulário de contato
 
@@ -114,14 +131,15 @@ O repositório precisa ser público para usar o Pages e o Pages CMS no plano gra
 
 ## Gestão de conteúdo
 
-A Faby publica e remove fotos pelo Pages CMS, sem editar código. O passo a passo está em
-[`docs/admin.md`](docs/admin.md). O dia a dia do formulário de orçamento está em
-[`docs/contato.md`](docs/contato.md).
+A Faby publica e remove fotos e atualiza a página inicial pelo Pages CMS, sem editar código. O
+passo a passo está em [`docs/admin.md`](docs/admin.md). O dia a dia do formulário de orçamento está
+em [`docs/contato.md`](docs/contato.md).
 
 ## Limites conhecidos
 
 - O limite de 10 MB por original e o formato suportado são verificados no workflow de publicação,
-  não no upload do Pages CMS.
+  tanto para as fotos do portfólio quanto para a foto da home.
+- A foto de destaque da home é uma amostra provisória até a Faby enviar a definitiva pelo painel.
 - O plano gratuito do Web3Forms entrega até 250 pedidos por mês; acima disso o visitante vê o
   contato direto.
 - A identidade visual está provisória em `src/styles/tokens.css`.

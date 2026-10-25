@@ -1,18 +1,128 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import HomeCategoryCard from '../components/HomeCategoryCard.astro';
+import { getActiveCategories } from '../lib/categories';
+import { getPhotosByCategory } from '../lib/gallery';
+import { getHome, resolveFeaturedCategories, splitParagraphs } from '../lib/home';
+import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from '../lib/contact';
 import { withBase } from '../lib/urls';
+
+const home = await getHome();
+const {
+  heroTitle,
+  heroText,
+  heroImage,
+  heroAlt,
+  featuredCategories,
+  aboutTitle,
+  aboutText,
+} = home.data;
+
+const categories = await getActiveCategories();
+const featured = resolveFeaturedCategories(categories, featuredCategories);
+const photosByCategory = await getPhotosByCategory(featured);
+const aboutParagraphs = splitParagraphs(aboutText);
 ---
 
 <BaseLayout
   title="Faby Fonseca Fotografia"
-  description="Portfólio fotográfico de Faby Fonseca: casamentos, ensaios, família, newborn e eventos."
+  description="Fotografia de casamentos, ensaios, família, newborn e eventos por Faby Fonseca. Histórias reais registradas com sensibilidade."
 >
-  <section class="hero">
-    <h1>Faby Fonseca Fotografia</h1>
-    <p>
-      Casamentos, ensaios, família, newborn e eventos. Histórias reais registradas
-      com sensibilidade e cuidado.
+  <section class="home-hero" data-home-hero aria-labelledby="home-hero-title">
+    <div class="home-hero__content">
+      <h1 id="home-hero-title" class="home-hero__title">{heroTitle}</h1>
+      <p class="home-hero__lead">{heroText}</p>
+      <div class="home-hero__actions">
+        <a
+          class="button"
+          href={withBase('/portfolio/')}
+          data-home-cta="portfolio"
+        >
+          Ver portfólio
+        </a>
+        <a
+          class="button button--secondary"
+          href={withBase('/contato/')}
+          data-home-cta="orcamento"
+        >
+          Solicitar orçamento
+        </a>
+      </div>
+    </div>
+
+    <figure class="home-hero__media" data-home-hero-media>
+      <Image
+        src={heroImage}
+        alt={heroAlt}
+        widths={[480, 800, 1200, 1600]}
+        sizes="(max-width: 899px) 100vw, 58vw"
+        loading="eager"
+        fetchpriority="high"
+        quality={80}
+      />
+    </figure>
+  </section>
+
+  <section
+    class="home-section"
+    data-home-categories
+    aria-labelledby="home-categories-title"
+  >
+    <h2 id="home-categories-title">Categorias em destaque</h2>
+    <p class="home-section__intro">
+      Escolha o tipo de história que você quer conhecer primeiro.
     </p>
-    <a class="button" href={withBase('/portfolio/')}>Ver portfólio</a>
+
+    {
+      featured.length === 0 ? (
+        <p class="empty-state">Nenhuma categoria publicada no momento.</p>
+      ) : (
+        <ul class="home-categories" role="list">
+          {featured.map((category) => (
+            <HomeCategoryCard
+              category={category}
+              photo={photosByCategory[category.data.slug]?.[0]}
+            />
+          ))}
+        </ul>
+      )
+    }
+  </section>
+
+  <section
+    class="home-section home-about"
+    data-home-about
+    aria-labelledby="home-about-title"
+  >
+    <h2 id="home-about-title">{aboutTitle}</h2>
+    {aboutParagraphs.map((paragraph) => <p class="home-about__text">{paragraph}</p>)}
+    <p class="home-instagram" data-home-instagram>
+      Acompanhe os bastidores no Instagram:{' '}
+      <a
+        href={INSTAGRAM_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-instagram-link
+      >
+        @{INSTAGRAM_HANDLE}
+      </a>
+    </p>
+  </section>
+
+  <section
+    class="home-cta"
+    data-home-final
+    aria-labelledby="home-cta-title"
+  >
+    <h2 id="home-cta-title">Vamos registrar a sua história?</h2>
+    <p>Conte o que você está planejando e receba um orçamento sem compromisso.</p>
+    <a
+      class="button"
+      href={withBase('/contato/')}
+      data-home-cta="orcamento-final"
+    >
+      Solicitar orçamento
+    </a>
   </section>
 </BaseLayout>

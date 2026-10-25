@@ -37,4 +37,38 @@ const photos = defineCollection({
     }),
 });
 
-export const collections = { categories, photos };
+const home = defineCollection({
+  loader: glob({ pattern: 'index.md', base: './content/home' }),
+  schema: ({ image }) =>
+    z.object({
+      heroTitle: z
+        .string()
+        .min(1, 'O título do destaque é obrigatório.')
+        .max(80, 'O título do destaque deve ter no máximo 80 caracteres.'),
+      heroText: z
+        .string()
+        .min(1, 'A frase de apresentação é obrigatória.')
+        .max(240, 'A frase de apresentação deve ter no máximo 240 caracteres.'),
+      heroImage: image(),
+      heroAlt: z
+        .string()
+        .min(1, 'O texto alternativo da foto é obrigatório.')
+        .max(160, 'O texto alternativo deve ter no máximo 160 caracteres.'),
+      featuredCategories: z
+        .array(slugSchema)
+        .length(3, 'Escolha exatamente 3 categorias em destaque.')
+        .refine((slugs) => new Set(slugs).size === slugs.length, {
+          message: 'As categorias em destaque não podem se repetir.',
+        }),
+      aboutTitle: z
+        .string()
+        .min(1, 'O título da seção sobre a Faby é obrigatório.')
+        .max(60, 'O título da seção sobre a Faby deve ter no máximo 60 caracteres.'),
+      aboutText: z
+        .string()
+        .min(1, 'O texto sobre a Faby é obrigatório.')
+        .max(600, 'O texto sobre a Faby deve ter no máximo 600 caracteres.'),
+    }),
+});
+
+export const collections = { categories, photos, home };
