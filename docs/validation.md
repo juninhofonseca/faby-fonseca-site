@@ -108,11 +108,27 @@ resultado (categoria criada, foto publicada/removida, recusa de `.gif` e de orig
 **Resultado**: ✅ aprovado nos testes automatizados. A inspeção visual em zoom de 200% e em
 dispositivo físico permanece como verificação manual recomendada antes do anúncio público.
 
+## Deploy de produção
+
+- URL publicada: **https://juninhofonseca.github.io/faby-fonseca-site/**
+- Workflow `Deploy` (run 40227000547) concluído com sucesso: build, orçamento de imagens, upload e
+  publicação no GitHub Pages.
+- Workflow `CI` (run 40227000571) concluído com sucesso: conteúdo, build, E2E, acessibilidade e
+  Lighthouse.
+- Verificado no site publicado: `/`, `/portfolio/`, `/contato/` e `sitemap-index.xml` respondem
+  200; CSS e imagens WebP carregam; link direto `?categoria=ensaios` ativa a categoria; o CTA leva
+  a `/contato/?categoria=ensaios` com a opção marcada.
+- O build usa `SITE_URL` e `SITE_BASE` no workflow para publicar na URL de projeto do Pages. Ao
+  ativar o domínio próprio, essas variáveis devem ser removidas de
+  `.github/workflows/deploy.yml` e o DNS configurado no GitHub Pages.
+
 ## Pendências antes do anúncio público
 
-1. **Cenário 4 no Pages CMS real** (T039) — depende de acesso à conta e ao repositório.
-2. **Deploy de produção no GitHub Pages** (T050) — habilitar Pages em Settings → Pages → GitHub
-   Actions, confirmar o domínio em `astro.config.mjs` e validar a URL publicada.
+1. **Cenário 4 no Pages CMS real** (T039) — depende de publicar/remover uma foto pela interface e
+   confirmar o deploy. O Pages CMS já criou o `.pages.yml` inicial no repositório, mas o fluxo
+   completo ainda não foi executado.
+2. **Domínio próprio** — apontar `fabyfonseca.com.br` no DNS, configurar o domínio no GitHub Pages,
+   ativar HTTPS e remover `SITE_URL`/`SITE_BASE` do workflow para publicar na raiz do domínio.
 3. **Inspeção visual manual** — zoom 200%, leitor de tela e dispositivos reais.
 4. **Conteúdo real e identidade visual** — as 6 fotos são amostras geradas e a paleta é provisória
    (`TODO(BRAND_IDENTITY)` em `src/styles/tokens.css`).

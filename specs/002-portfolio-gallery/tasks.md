@@ -176,7 +176,7 @@ diretamente e confirmar que nenhuma opção vem marcada.
 - [X] T047 [P] Revisar desempenho em `src/components/PhotoCard.astro` e `src/scripts/`: primeiras imagens `eager`/`fetchpriority`, demais `lazy`, e confirmar JavaScript da galeria restrito a filtro e lightbox
 - [X] T048 [P] Revisar acessibilidade em `src/styles/global.css` e componentes: contraste AA, foco visível, alvos ≥ 44 px, ordem de foco e zoom em 200%
 - [X] T049 Executar todos os cenários de `quickstart.md` e registrar os resultados em `docs/validation.md`
-- [ ] T050 Rodar a suíte completa (`test:content`, `check:images`, `build`, `test:e2e`, `test:a11y`, `test:lighthouse`), corrigir falhas, registrar o resultado em `docs/validation.md` e confirmar o deploy de produção no GitHub Pages — **suíte executada e registrada**; falta confirmar o deploy de produção no GitHub Pages
+- [X] T050 Rodar a suíte completa (`test:content`, `check:images`, `build`, `test:e2e`, `test:a11y`, `test:lighthouse`), corrigir falhas, registrar o resultado em `docs/validation.md` e confirmar o deploy de produção no GitHub Pages — **concluída**: suíte registrada e deploy confirmado em https://juninhofonseca.github.io/faby-fonseca-site/ (domínio próprio pendente de DNS)
 
 ---
 
