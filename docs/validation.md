@@ -277,12 +277,15 @@ A mensagem de teste foi apagada da caixa.
   resposta HTTP **200** com `success: true`, painel de sucesso visível, sem erros de console.
   Assunto gerado: `Novo pedido de orçamento — Casamentos — Teste Deploy Faby`;
   `consent_at` = `2026-10-25T20:39:11.458Z`.
+- As duas mensagens de teste (envio local "Teste Site Faby" e envio de produção
+  "Teste Deploy Faby") foram recebidas, conferidas e **apagadas da caixa de entrada**.
 - Workflow **CI** (run 40231689658) concluído com sucesso no mesmo commit: conteúdo, testes
   unitários, `build:test`, 70 testes E2E (desktop + mobile, incluindo axe) e Lighthouse.
 
 ## Pendências desta feature
 
-1. **Mensagem de teste do deploy** — apagar o e-mail "Teste Deploy Faby" da caixa.
-2. **Restrição de domínio (opcional)** — o recurso **Restrict to Domain** do Web3Forms é exclusivo
+Nenhuma pendência bloqueante: a feature está publicada, validada e sem dados de teste residuais.
+
+1. **Restrição de domínio (opcional)** — o recurso **Restrict to Domain** do Web3Forms é exclusivo
    do plano PRO. No plano gratuito, a mitigação é monitorar o painel e rotacionar a chave se houver
    spam. A chave é pública e só envia para o e-mail cadastrado.

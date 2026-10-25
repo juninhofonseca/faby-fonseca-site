@@ -96,11 +96,11 @@ CI não depende da chave real.
 
 ## 8. Critérios de aceite da validação
 
-- [ ] Formulário completo com a chave configurada; contato direto sem ela.
-- [ ] Envio real recebido, com consentimento, versão e data/hora.
-- [ ] Todos os cenários da tabela aprovados.
-- [ ] `npm run check` sem erros.
-- [ ] `npm run test:e2e` verde (incluindo axe e sem JavaScript).
-- [ ] Lighthouse ≥ 90 em `/contato/` e `/privacidade/`.
-- [ ] Nenhum dado pessoal no repositório, na URL ou no armazenamento do navegador.
-- [ ] `docs/validation.md` atualizado com data, resultados e pendências.
+- [x] Formulário completo com a chave configurada; contato direto sem ela.
+- [x] Envio real recebido, com consentimento, versão e data/hora.
+- [x] Todos os cenários da tabela aprovados.
+- [x] `npm run check` sem erros.
+- [x] `npm run test:e2e` verde (incluindo axe e sem JavaScript).
+- [x] Lighthouse ≥ 90 em `/contato/` e `/privacidade/`.
+- [x] Nenhum dado pessoal no repositório, na URL ou no armazenamento do navegador.
+- [x] `docs/validation.md` atualizado com data, resultados e pendências.
