@@ -138,7 +138,7 @@ remover e confirmar que desaparece; tentar `.gif` e original acima de 10 MB e co
 - [X] T036 [US4] Criar `.pages.yml` conforme `contracts/content-schema.md`: mídia em `content/photos/images` com saída `images`, `rename: safe` e extensões `jpg`, `jpeg`, `png`, `webp`; coleções `categories` e `photos` com todos os campos, rótulos em português e `reference` para categoria
 - [X] T037 [US4] Adicionar mensagens de erro acionáveis em `src/content.config.ts` e `scripts/check-image-budget.mjs`, indicando arquivo, campo e limite violado
 - [X] T038 [US4] Criar `docs/admin.md` com o passo a passo da Faby: convite no Pages CMS, autorização no GitHub, criação de categoria, envio de foto, ordem, publicação, remoção e o que fazer quando o workflow falhar
-- [ ] T039 [US4] Executar o Cenário 4 de `quickstart.md` no Pages CMS real e registrar o resultado e eventuais ajustes em `docs/admin.md` — **pendente**: exige conta autorizada no Pages CMS e deploy real (ver `docs/validation.md`)
+- [X] T039 [US4] Executar o Cenário 4 de `quickstart.md` no Pages CMS real e registrar o resultado e eventuais ajustes em `docs/admin.md` — **concluída**: publicação e remoção verificadas no painel (commits `994f434`, `57f24eb` e `150f72f`), com deploy automático e site atualizado
 
 **Checkpoint**: o conteúdo é gerenciável sem código e as invariantes são verificadas no CI.
 

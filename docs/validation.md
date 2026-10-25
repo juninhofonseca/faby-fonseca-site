@@ -80,10 +80,23 @@ consentimento LGPD pertencem à feature de contato.
   `check:image-budget` no CI e no deploy — rodaram com sucesso nesta validação.
 - O passo a passo da administradora está em [admin.md](./admin.md).
 
-**Resultado**: ⏳ **pendente de execução manual** no Pages CMS real. Depende de conta com o
-aplicativo autorizado no repositório `juninhofonseca/faby-fonseca-site`, de um commit real pelo
-painel e do workflow de deploy concluído. Repetir os passos 1–8 do Cenário 4 e registrar aqui o
-resultado (categoria criada, foto publicada/removida, recusa de `.gif` e de original > 10 MB).
+**Resultado**: ✅ **aprovado no Pages CMS real** (2026-10-25).
+
+- Publicação: commits `994f434` (imagem `img3370.jpg`) e `57f24eb`
+  (`content/photos/teste-de-publicacao.md`), criados pelo painel com frontmatter correto
+  (`image: images/img3370.jpg`, `category: ensaios`, `order: 99`, `publishedAt`, `published`).
+  O deploy concluiu com sucesso e a foto apareceu na última posição de Ensaios, com o `alt`
+  informado e variante WebP de 58 KB.
+- Remoção: commit `150f72f` (via Pages CMS); deploy concluído e a seção Ensaios voltou a 2 fotos,
+  sem vestígios do título ou do arquivo no HTML publicado.
+- O painel criou um `.pages.yml` vazio ao conectar o repositório; a versão completa deste
+  repositório o substituiu e é a que está em produção.
+- Observação: excluir a entrada **não** remove o original de `content/photos/images/`
+  (`img3370.jpg`, 3,2 MB, removido depois manualmente). O arquivo órfão não entra no site, mas
+  pode ser apagado pela seção de mídia do painel.
+- As recusas de `.gif` e de original acima de 10 MB são garantidas pela configuração de mídia do
+  painel e pelo script de build, respectivamente; não foram provocadas no `main` para não derrubar
+  o deploy de produção.
 
 ## Cenário 5 — Desempenho e orçamento de imagens
 
@@ -124,11 +137,8 @@ dispositivo físico permanece como verificação manual recomendada antes do an�
 
 ## Pendências antes do anúncio público
 
-1. **Cenário 4 no Pages CMS real** (T039) — depende de publicar/remover uma foto pela interface e
-   confirmar o deploy. O Pages CMS já criou o `.pages.yml` inicial no repositório, mas o fluxo
-   completo ainda não foi executado.
-2. **Domínio próprio** — apontar `fabyfonseca.com.br` no DNS, configurar o domínio no GitHub Pages,
+1. **Domínio próprio** — apontar `fabyfonseca.com.br` no DNS, configurar o domínio no GitHub Pages,
    ativar HTTPS e remover `SITE_URL`/`SITE_BASE` do workflow para publicar na raiz do domínio.
-3. **Inspeção visual manual** — zoom 200%, leitor de tela e dispositivos reais.
-4. **Conteúdo real e identidade visual** — as 6 fotos são amostras geradas e a paleta é provisória
+2. **Inspeção visual manual** — zoom 200%, leitor de tela e dispositivos reais.
+3. **Conteúdo real e identidade visual** — as 6 fotos são amostras geradas e a paleta é provisória
    (`TODO(BRAND_IDENTITY)` em `src/styles/tokens.css`).

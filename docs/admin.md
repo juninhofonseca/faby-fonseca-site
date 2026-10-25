@@ -68,3 +68,13 @@ Abra a aba **Actions** do repositório e veja a mensagem do workflow **Deploy**.
 
 Depois de corrigir, publique novamente. O site continua no ar com a versão anterior até o novo
 deploy terminar.
+
+## Validação do fluxo
+
+Em 2026-10-25 o fluxo foi executado no Pages CMS real com uma foto de teste na categoria Ensaios:
+a publicação (commits `994f434` e `57f24eb`) e a remoção (commit `150f72f`) funcionaram, com deploy
+automático e site atualizado sem editar código.
+
+Atenção: excluir a entrada da coleção **Fotos** não apaga o arquivo original em
+`content/photos/images/`. Para limpar o repositório, exclua também a imagem pela seção de mídia
+do painel.
