@@ -125,7 +125,7 @@ Projeto único Astro: conteúdo em `content/`, código em `src/`, testes em `tes
 - [X] T028 Registrar em `docs/validation.md` a seção da feature 004 com resultados, métricas, cobertura automatizada e pendências
 - [X] T029 Verificar manualmente 360, 768 e 1280 px, navegação por teclado, zoom de 200%, textos alternativos e ausência de rolagem horizontal
 - [X] T030 Confirmar que nenhum dado pessoal, chave ou token novo aparece em `git status`, `git diff` ou arquivos versionados
-- [ ] T031 Fazer commit, push em `main`, acompanhar os workflows **Deploy** e **CI** e verificar a home na URL publicada
+- [X] T031 Fazer commit, push em `main`, acompanhar os workflows **Deploy** e **CI** e verificar a home na URL publicada
 - [X] T032 Confirmar que a validação de conteúdo bloqueia uma categoria em destaque inativa e uma imagem ausente (teste local descartável, sem publicar configuração inválida) e registrar o resultado em `docs/validation.md`
 
 ---

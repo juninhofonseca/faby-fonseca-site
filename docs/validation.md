@@ -432,6 +432,22 @@ anterior continua no ar.
 - Funcionamento sem JavaScript.
 - axe-core sem violações em `/`.
 
+## Deploy de produção
+
+- URL publicada: **https://juninhofonseca.github.io/faby-fonseca-site/**
+- Commit publicado: `ca6ad75` (`feat: home com foto de destaque e Instagram (004)`).
+- Workflow **Deploy** (run 13, 40238861773) concluído com sucesso; **CI** (run 13, 40238861789) com
+  conteúdo, testes unitários, `build:test`, 94 testes E2E (desktop + mobile, incluindo axe) e
+  Lighthouse.
+- Verificado no site publicado:
+  - `/` responde 200 com o `h1` "Histórias reais, registradas com sensibilidade", a seção sobre a
+    Faby e as três categorias (Casamentos, Ensaios, Família) na ordem;
+  - a foto de destaque é servida em WebP com `srcset` de 480, 800, 1200 e 1600 px sob o prefixo
+    `/faby-fonseca-site/`, e os links de portfólio, orçamento e categoria também usam o prefixo;
+  - o Instagram aparece na home e no rodapé de `/`, `/portfolio/`, `/contato/` e `/privacidade/`,
+    sempre com a URL canônica do perfil;
+  - a home publicada não tem `<script src>` nem `iframe`: nenhum JavaScript próprio ou de terceiros.
+
 ## Pendências desta feature
 
 1. **Edição real pelo Pages CMS (T023)** — executar o cenário 4 do quickstart quando houver acesso ao
