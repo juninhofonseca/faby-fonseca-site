@@ -5,6 +5,8 @@ import { getActiveCategories } from '../lib/categories';
 import { withBase } from '../lib/urls';
 import {
   CONTACT_EMAIL,
+  INSTAGRAM_HANDLE,
+  INSTAGRAM_URL,
   buildMailtoHref,
   buildWhatsappHref,
   getWeb3FormsKey,
@@ -16,7 +18,6 @@ const categories = await getActiveCategories();
 const accessKey = getWeb3FormsKey();
 const formConfigured = isFormConfigured(accessKey);
 
-// Envio sem JavaScript: o Web3Forms redireciona para uma página estática de confirmação.
 const siteOrigin = Astro.site ?? new URL('https://fabyfonseca.com.br');
 const redirectUrl = new URL(withBase('/contato/enviado/'), siteOrigin).href;
 
@@ -34,6 +35,25 @@ const whatsappHref = buildWhatsappHref();
     portfólio já vem selecionada aqui e pode ser alterada.
   </p>
 
+  <section class="contact-channels" aria-labelledby="canais-contato">
+    <h2 id="canais-contato">Fale com a Faby</h2>
+    <ul role="list">
+      <li>
+        <a href={whatsappHref} target="_blank" rel="noopener noreferrer" data-contact-whatsapp>
+          WhatsApp: mensagem já preenchida
+        </a>
+      </li>
+      <li>
+        <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" data-contact-instagram>
+          Instagram: @{INSTAGRAM_HANDLE}
+        </a>
+      </li>
+      <li>
+        <a href={emailHref} data-contact-email>{CONTACT_EMAIL}</a>
+      </li>
+    </ul>
+  </section>
+
   {
     formConfigured ? (
       <ContactForm
@@ -44,21 +64,11 @@ const whatsappHref = buildWhatsappHref();
       />
     ) : (
       <section class="contact-direct" data-direct-contact aria-labelledby="contato-direto">
-        <h2 id="contato-direto">Fale direto com a Faby</h2>
+        <h2 id="contato-direto">Pedido de orçamento</h2>
         <p>
           Para pedir um orçamento, envie um e-mail ou fale pelo WhatsApp. A resposta chega em até
           2 dias úteis.
         </p>
-        <ul>
-          <li>
-            <a href={emailHref} data-contact-email>{CONTACT_EMAIL}</a>
-          </li>
-          <li>
-            <a href={whatsappHref} target="_blank" rel="noopener noreferrer" data-contact-whatsapp>
-              WhatsApp
-            </a>
-          </li>
-        </ul>
       </section>
     )
   }

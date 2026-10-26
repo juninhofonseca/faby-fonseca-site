@@ -35,15 +35,15 @@ content/
   home/
     index.md
     images/
-      hero-home.jpg       ← foto real aprovada (≥ 2400 px)
+      hero-home.jpg       ← foto real aprovada (largura e altura ≥ 2400 px)
   sobre/
     index.md
     images/             ← opcional; criada se houver retrato
 ```
 
 - O nome da pasta é o `slug` da categoria.
-- A pasta `imagens/` pode existir vazia; o Git não versiona pastas vazias, então a implementação
-  deve criar um `.gitkeep` ou aceitar a ausência até a primeira foto.
+- A pasta `imagens/` pode existir vazia. Para versioná-la, use `imagens/.gitkeep`; os validadores
+  ignoram arquivos iniciados por ponto.
 - Nenhuma imagem é referenciada fora da pasta da própria categoria.
 
 ## Frontmatter da categoria
@@ -82,14 +82,17 @@ entrada única e para manter a mídia ao lado do conteúdo.
 | `slug` | string | sim | igual ao nome da pasta; `^[a-z0-9]+(?:-[a-z0-9]+)*$` |
 | `description` | string | sim | 1–160 caracteres |
 | `order` | number | sim | inteiro ≥ 0 |
-| `active` | boolean | sim | padrão `true` |
+| `active` | boolean | sim | fixo em `true` nesta versão; somente leitura no painel |
 | `photos` | object[] | não | padrão `[]`; pode ser vazia; itens conforme abaixo |
 | `photos[].title` | string | sim | 1–80 caracteres |
 | `photos[].alt` | string | sim | 1–160 caracteres, não vazio |
 | `photos[].image` | image | sim | `imagens/<arquivo>` relativo ao `index.md` |
 | `photos[].order` | number | sim | inteiro ≥ 0, único na categoria |
 | `photos[].published` | boolean | sim | padrão `true` |
-| `photos[].publishedAt` | date | não | ISO `AAAA-MM-DD` |
+| `photos[].publishedAt` | date | não | ISO `AAAA-MM-DD`; ausente conta como `0` no desempate |
+
+A ordenação usa `order`; quando duas fotos empatam, `publishedAt` decide e, por último, `title`. Foto
+sem `publishedAt` conta como `0` no desempate e nunca quebra o build.
 
 ## Frontmatter da home
 
@@ -116,15 +119,15 @@ aboutSummary: A fotografia é a minha forma de guardar o que passa rápido. Acom
 |---|---|---|---|
 | `heroTitle` | string | sim | 1–80 caracteres; único `h1` da home |
 | `heroText` | string | sim | 1–240 caracteres |
-| `heroImage` | image | sim | `images/<arquivo>`; **lado maior e altura ≥ 2400 px**; ≤ 10 MB |
+| `heroImage` | image | sim | `images/<arquivo>`; **largura e altura ≥ 2400 px**; ≤ 10 MB |
 | `heroAlt` | string | sim | 1–160 caracteres; descreve a imagem atual |
-| `featuredCategories` | string[] | sim | exatamente 3 slugs distintos, todos ativos |
+| `featuredCategories` | string[] | sim | exatamente 3 slugs distintos, todos ativos; a exibição segue `order` da categoria |
 | `aboutTitle` | string | sim | 1–60 caracteres |
 | `aboutSummary` | string | sim | 1–400 caracteres |
 
 `heroImage` aceita `jpg`, `jpeg`, `png` e `webp`. A exibição é retrato 3:4 com recorte que preserva o
 assunto. A foto atual (`hero-home.jpg`, 4898 × 3266 px) está aprovada; o recorte e o `alt` também.
-Qualquer arquivo abaixo de 2400 px **não** passa na validação.
+Qualquer arquivo com largura ou altura abaixo de 2400 px **não** passa na validação.
 
 ## Frontmatter da página Sobre
 
@@ -133,7 +136,7 @@ Arquivo: `content/sobre/index.md`
 ```markdown
 ---
 title: Sobre a Faby
-intro: Fotógrafa de casamentos, ensaios, família, newborn e eventos.
+intro: Casamentos, ensaios, família, newborn e eventos.
 updatedAt: 2026-10-25
 ---
 
@@ -147,13 +150,19 @@ sentido daqui a muitos anos.
 | Campo | Tipo | Obrigatório | Contrato |
 |---|---|---|---|
 | `title` | string | sim | 1–80 caracteres; `h1` |
-| `intro` | string | sim | 1–240 caracteres |
-| `body` | markdown | sim | 1–4000 caracteres |
+| `intro` | string | sim | 1–240 caracteres; primeira frase existente de `heroText`, sem texto novo |
+| `body` | markdown | sim | 1–4000 caracteres; campo especial `body` no CMS, lido de `entry.body`; não é campo do schema Zod |
 | `image` | image | não | `images/<arquivo>`; ≤ 10 MB |
 | `imageAlt` | string | condicional | obrigatório se `image` existir; 1–160 caracteres |
 | `updatedAt` | date | não | ISO `AAAA-MM-DD` |
 
 O texto completo vem do conteúdo atual do site e não pode ser reescrito nem inventado nesta feature.
+O `intro` reaproveita a primeira frase de `heroText`; o texto completo de `aboutText` vai no corpo
+Markdown.
+
+O `body` é a **chave especial** do Pages CMS: aparece no `.pages.yml` como campo `rich-text`, mas o
+conteúdo é gravado abaixo do frontmatter e o Astro o expõe como `entry.body`. Por isso ele não entra
+no schema Zod nem no frontmatter do arquivo.
 
 ## Configuração do Pages CMS (`.pages.yml`)
 
@@ -220,6 +229,8 @@ content:
           - name: active
             label: Ativa
             type: boolean
+            readonly: true
+            description: Fixo em verdadeiro nesta versão; as cinco categorias são sempre publicadas.
           - name: photos
             label: Fotos
             type: object
@@ -255,7 +266,7 @@ content:
     format: yaml-frontmatter
     fields:
       # heroTitle, heroText, heroImage (media: home), heroAlt,
-      # featuredCategories, aboutTitle, aboutSummary
+      # featuredCategories como select múltiplo (ver abaixo), aboutTitle, aboutSummary
 
   - name: sobre
     label: Sobre
@@ -263,11 +274,48 @@ content:
     path: content/sobre/index.md
     format: yaml-frontmatter
     fields:
-      # title, intro, image (media: sobre), imageAlt, updatedAt, body
+      - name: title
+        label: Título
+        type: string
+      - name: intro
+        label: Introdução
+        type: text
+      - name: body
+        label: Texto de apresentação
+        type: rich-text
+        required: true
+        options:
+          format: markdown
+          media: false
+      # image (media: sobre), imageAlt, updatedAt
 ```
 
-`featuredCategories` continua como `reference` para a coleção `categories`, com `multiple: true`,
-`min: 3`, `max: 3`, `value: "{fields.slug}"` e `label: "{fields.name}"`.
+`featuredCategories` usa `select` fixo, porque as cinco categorias são fixas nesta versão e o Pages
+CMS exige uma coleção configurada para `reference`:
+
+```yaml
+- name: featuredCategories
+  label: Categorias em destaque
+  type: select
+  options:
+    multiple: true
+    min: 3
+    max: 3
+    values:
+      - name: casamentos
+        label: Casamentos
+      - name: ensaios
+        label: Ensaios
+      - name: familia
+        label: Família
+      - name: newborn
+        label: Newborn
+      - name: eventos
+        label: Eventos
+  description: Escolha exatamente três categorias. A ordem de exibição segue a ordem do portfólio.
+```
+
+A ordem dos cartões na home é a ordem `order` das categorias, não a ordem em que foram selecionadas.
 
 ### Por que cinco entradas de arquivo
 
@@ -282,7 +330,7 @@ certa. Alternativas (fonte única, `type: tree`, referência a outra coleção) 
 - Limite do original: 10 MB.
 - Nome do arquivo: slug seguro, sem espaços nem acentos (`rename: safe` no CMS).
 - Exportação recomendada para a galeria: lado maior de 2400 px, qualidade ~80.
-- Hero: lado maior e altura ≥ 2400 px; exibição em retrato 3:4 com recorte que preserva o assunto.
+- Hero: largura e altura ≥ 2400 px; exibição em retrato 3:4 com recorte que preserva o assunto.
 - Variante de listagem: ≤ 300 KB (WebP, larguras 480/960/1440 conforme o breakpoint).
 - Toda imagem tem `alt` descritivo em português do Brasil, sem “imagem de...” redundante.
 
@@ -291,7 +339,8 @@ certa. Alternativas (fonte única, `type: tree`, referência a outra coleção) 
 1. Criar as cinco pastas em `content/portfolio/` com `index.md`.
 2. Mover as seis imagens para a pasta da categoria correspondente.
 3. Converter cada foto em item de `photos[]`, preservando título, alt, ordem, data e situação.
-4. Criar `content/sobre/index.md` com o texto completo que hoje está em `aboutText`.
+4. Criar `content/sobre/index.md` com o texto completo que hoje está em `aboutText` no corpo Markdown e
+   o `intro` com a primeira frase existente de `heroText`.
 5. Reduzir a home a `aboutSummary` + link.
 6. Remover `content/categories/` e `content/photos/` no mesmo commit.
 7. Atualizar schema, CMS, scripts e testes.
@@ -301,14 +350,16 @@ Nenhum texto é reescrito na migração.
 ## Invariantes verificadas no build
 
 1. As cinco pastas existem e o `slug` de cada frontmatter é igual ao nome da pasta.
-2. Não há slugs duplicados nem categorias ativas fora das cinco previstas.
+2. Existem exatamente cinco categorias, uma por pasta, todas com `active: true`; não há slugs
+   duplicados nem categoria fora das cinco previstas.
 3. Todo `alt` publicado é não vazio e ≤ 160 caracteres.
 4. Toda `image` referenciada existe, tem extensão suportada e original ≤ 10 MB.
 5. Toda variante de listagem ≤ 300 KB.
-6. O hero tem lado maior e altura ≥ 2400 px, é exibido em retrato 3:4 preservando o assunto e tem
+6. O hero tem largura e altura ≥ 2400 px, é exibido em retrato 3:4 preservando o assunto e tem
    `alt` descritivo.
 7. `featuredCategories` tem exatamente três slugs ativos e distintos.
-8. A página Sobre tem `title`, `intro` e `body` não vazios; `imageAlt` existe se houver `image`.
+8. A página Sobre tem `title`, `intro` e corpo Markdown (`body`) não vazios; `imageAlt` existe se
+   houver `image`.
 9. Nenhum arquivo de demonstração do tema é publicado.
 
 A aprovação editorial da foto do hero (identidade, recorte e `alt`) é registrada no checklist de
@@ -325,7 +376,11 @@ deploy não acontece até a correção; o site anterior continua no ar.
 3. Para alterar a descrição: editar **Descrição curta** e publicar.
 4. Para editar a home: abrir **Página inicial**, alterar textos ou trocar a foto de destaque e o
    respectivo texto alternativo.
-5. Para editar a apresentação: abrir **Sobre** e alterar o texto.
+5. Para editar a apresentação: abrir **Sobre** e alterar a **Introdução** ou o **Texto de
+   apresentação** (editor rich-text).
 6. Publicar e aguardar o workflow **Deploy**.
+
+O campo **Ativa** aparece somente para leitura e permanece verdadeiro: as cinco categorias fazem parte
+da estrutura do site nesta versão.
 
 O passo a passo voltado para a administradora será atualizado em `docs/admin.md` na implementação.

@@ -4,7 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import HomeCategoryCard from '../components/HomeCategoryCard.astro';
 import { getActiveCategories } from '../lib/categories';
 import { getPhotosByCategory } from '../lib/gallery';
-import { getHome, resolveFeaturedCategories, splitParagraphs } from '../lib/home';
+import { getHome, resolveFeaturedCategories } from '../lib/home';
 import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from '../lib/contact';
 import { withBase } from '../lib/urls';
 
@@ -16,13 +16,12 @@ const {
   heroAlt,
   featuredCategories,
   aboutTitle,
-  aboutText,
+  aboutSummary,
 } = home.data;
 
 const categories = await getActiveCategories();
 const featured = resolveFeaturedCategories(categories, featuredCategories);
-const photosByCategory = await getPhotosByCategory(featured);
-const aboutParagraphs = splitParagraphs(aboutText);
+const photosByCategory = getPhotosByCategory(featured);
 ---
 
 <BaseLayout
@@ -34,11 +33,7 @@ const aboutParagraphs = splitParagraphs(aboutText);
       <h1 id="home-hero-title" class="home-hero__title">{heroTitle}</h1>
       <p class="home-hero__lead">{heroText}</p>
       <div class="home-hero__actions">
-        <a
-          class="button"
-          href={withBase('/portfolio/')}
-          data-home-cta="portfolio"
-        >
+        <a class="button" href={withBase('/portfolio/')} data-home-cta="portfolio">
           Ver portfólio
         </a>
         <a
@@ -56,47 +51,40 @@ const aboutParagraphs = splitParagraphs(aboutText);
         src={heroImage}
         alt={heroAlt}
         widths={[480, 800, 1200, 1600]}
-        sizes="(max-width: 899px) 100vw, 58vw"
+        sizes="(max-width: 899px) 100vw, 42vw"
         loading="eager"
         fetchpriority="high"
-        quality={80}
+        quality={82}
       />
     </figure>
   </section>
 
-  <section
-    class="home-section"
-    data-home-categories
-    aria-labelledby="home-categories-title"
-  >
+  <section class="home-section" data-home-categories aria-labelledby="home-categories-title">
     <h2 id="home-categories-title">Categorias em destaque</h2>
     <p class="home-section__intro">
       Escolha o tipo de história que você quer conhecer primeiro.
     </p>
 
-    {
-      featured.length === 0 ? (
-        <p class="empty-state">Nenhuma categoria publicada no momento.</p>
-      ) : (
-        <ul class="home-categories" role="list">
-          {featured.map((category) => (
-            <HomeCategoryCard
-              category={category}
-              photo={photosByCategory[category.data.slug]?.[0]}
-            />
-          ))}
-        </ul>
-      )
-    }
+    <ul class="home-categories" role="list">
+      {
+        featured.map((category) => (
+          <HomeCategoryCard
+            category={category}
+            photo={photosByCategory[category.data.slug]?.[0]}
+          />
+        ))
+      }
+    </ul>
   </section>
 
-  <section
-    class="home-section home-about"
-    data-home-about
-    aria-labelledby="home-about-title"
-  >
+  <section class="home-section home-about" data-home-about aria-labelledby="home-about-title">
     <h2 id="home-about-title">{aboutTitle}</h2>
-    {aboutParagraphs.map((paragraph) => <p class="home-about__text">{paragraph}</p>)}
+    <p class="home-about__text">{aboutSummary}</p>
+    <p>
+      <a class="button button--secondary" href={withBase('/sobre/')} data-home-sobre-link>
+        Conhecer a Faby
+      </a>
+    </p>
     <p class="home-instagram" data-home-instagram>
       Acompanhe os bastidores no Instagram:{' '}
       <a
@@ -110,18 +98,10 @@ const aboutParagraphs = splitParagraphs(aboutText);
     </p>
   </section>
 
-  <section
-    class="home-cta"
-    data-home-final
-    aria-labelledby="home-cta-title"
-  >
+  <section class="home-cta" data-home-final aria-labelledby="home-cta-title">
     <h2 id="home-cta-title">Vamos registrar a sua história?</h2>
     <p>Conte o que você está planejando e receba um orçamento sem compromisso.</p>
-    <a
-      class="button"
-      href={withBase('/contato/')}
-      data-home-cta="orcamento-final"
-    >
+    <a class="button" href={withBase('/contato/')} data-home-cta="orcamento-final">
       Solicitar orçamento
     </a>
   </section>

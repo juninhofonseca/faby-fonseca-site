@@ -1,19 +1,295 @@
 media:
-  - name: photos
-    label: Fotos do portfólio
-    input: content/photos/images
-    output: images
+  - name: portfolio-casamentos
+    label: Fotos — Casamentos
+    input: content/portfolio/casamentos/imagens
+    output: imagens
     rename: safe
     extensions: [jpg, jpeg, png, webp]
-
+  - name: portfolio-ensaios
+    label: Fotos — Ensaios
+    input: content/portfolio/ensaios/imagens
+    output: imagens
+    rename: safe
+    extensions: [jpg, jpeg, png, webp]
+  - name: portfolio-familia
+    label: Fotos — Família
+    input: content/portfolio/familia/imagens
+    output: imagens
+    rename: safe
+    extensions: [jpg, jpeg, png, webp]
+  - name: portfolio-newborn
+    label: Fotos — Newborn
+    input: content/portfolio/newborn/imagens
+    output: imagens
+    rename: safe
+    extensions: [jpg, jpeg, png, webp]
+  - name: portfolio-eventos
+    label: Fotos — Eventos
+    input: content/portfolio/eventos/imagens
+    output: imagens
+    rename: safe
+    extensions: [jpg, jpeg, png, webp]
   - name: home
     label: Foto da página inicial
     input: content/home/images
     output: images
     rename: safe
     extensions: [jpg, jpeg, png, webp]
+  - name: sobre
+    label: Foto da página Sobre
+    input: content/sobre/images
+    output: images
+    rename: safe
+    extensions: [jpg, jpeg, png, webp]
 
 content:
+  - name: portfolio
+    label: Portfólio
+    type: group
+    items:
+      - name: casamentos
+        label: Casamentos
+        type: file
+        path: content/portfolio/casamentos/index.md
+        format: yaml-frontmatter
+        fields:
+          - name: name
+            label: Nome
+            type: string
+          - name: slug
+            label: Slug
+            type: string
+            readonly: true
+            description: Não altere depois de publicado.
+          - name: description
+            label: Descrição curta
+            type: text
+          - name: order
+            label: Ordem
+            type: number
+          - name: active
+            label: Ativa
+            type: boolean
+            readonly: true
+            description: Fixo em verdadeiro nesta versão; as cinco categorias são sempre publicadas.
+          - name: photos
+            label: Fotos
+            type: object
+            list: true
+            fields:
+              - name: title
+                label: Título interno
+                type: string
+              - name: alt
+                label: Texto alternativo
+                type: string
+              - name: image
+                label: Imagem
+                type: image
+                options:
+                  media: portfolio-casamentos
+              - name: order
+                label: Ordem
+                type: number
+              - name: published
+                label: Publicada
+                type: boolean
+              - name: publishedAt
+                label: Data
+                type: date
+      - name: ensaios
+        label: Ensaios
+        type: file
+        path: content/portfolio/ensaios/index.md
+        format: yaml-frontmatter
+        fields:
+          - name: name
+            label: Nome
+            type: string
+          - name: slug
+            label: Slug
+            type: string
+            readonly: true
+          - name: description
+            label: Descrição curta
+            type: text
+          - name: order
+            label: Ordem
+            type: number
+          - name: active
+            label: Ativa
+            type: boolean
+            readonly: true
+          - name: photos
+            label: Fotos
+            type: object
+            list: true
+            fields:
+              - name: title
+                label: Título interno
+                type: string
+              - name: alt
+                label: Texto alternativo
+                type: string
+              - name: image
+                label: Imagem
+                type: image
+                options:
+                  media: portfolio-ensaios
+              - name: order
+                label: Ordem
+                type: number
+              - name: published
+                label: Publicada
+                type: boolean
+              - name: publishedAt
+                label: Data
+                type: date
+      - name: familia
+        label: Família
+        type: file
+        path: content/portfolio/familia/index.md
+        format: yaml-frontmatter
+        fields:
+          - name: name
+            label: Nome
+            type: string
+          - name: slug
+            label: Slug
+            type: string
+            readonly: true
+          - name: description
+            label: Descrição curta
+            type: text
+          - name: order
+            label: Ordem
+            type: number
+          - name: active
+            label: Ativa
+            type: boolean
+            readonly: true
+          - name: photos
+            label: Fotos
+            type: object
+            list: true
+            fields:
+              - name: title
+                label: Título interno
+                type: string
+              - name: alt
+                label: Texto alternativo
+                type: string
+              - name: image
+                label: Imagem
+                type: image
+                options:
+                  media: portfolio-familia
+              - name: order
+                label: Ordem
+                type: number
+              - name: published
+                label: Publicada
+                type: boolean
+              - name: publishedAt
+                label: Data
+                type: date
+      - name: newborn
+        label: Newborn
+        type: file
+        path: content/portfolio/newborn/index.md
+        format: yaml-frontmatter
+        fields:
+          - name: name
+            label: Nome
+            type: string
+          - name: slug
+            label: Slug
+            type: string
+            readonly: true
+          - name: description
+            label: Descrição curta
+            type: text
+          - name: order
+            label: Ordem
+            type: number
+          - name: active
+            label: Ativa
+            type: boolean
+            readonly: true
+          - name: photos
+            label: Fotos
+            type: object
+            list: true
+            fields:
+              - name: title
+                label: Título interno
+                type: string
+              - name: alt
+                label: Texto alternativo
+                type: string
+              - name: image
+                label: Imagem
+                type: image
+                options:
+                  media: portfolio-newborn
+              - name: order
+                label: Ordem
+                type: number
+              - name: published
+                label: Publicada
+                type: boolean
+              - name: publishedAt
+                label: Data
+                type: date
+      - name: eventos
+        label: Eventos
+        type: file
+        path: content/portfolio/eventos/index.md
+        format: yaml-frontmatter
+        fields:
+          - name: name
+            label: Nome
+            type: string
+          - name: slug
+            label: Slug
+            type: string
+            readonly: true
+          - name: description
+            label: Descrição curta
+            type: text
+          - name: order
+            label: Ordem
+            type: number
+          - name: active
+            label: Ativa
+            type: boolean
+            readonly: true
+          - name: photos
+            label: Fotos
+            type: object
+            list: true
+            fields:
+              - name: title
+                label: Título interno
+                type: string
+              - name: alt
+                label: Texto alternativo
+                type: string
+              - name: image
+                label: Imagem
+                type: image
+                options:
+                  media: portfolio-eventos
+              - name: order
+                label: Ordem
+                type: number
+              - name: published
+                label: Publicada
+                type: boolean
+              - name: publishedAt
+                label: Data
+                type: date
+
   - name: home
     label: Página inicial
     type: file
@@ -39,84 +315,59 @@ content:
         description: Descreva a foto para quem não pode vê-la. Até 160 caracteres.
       - name: featuredCategories
         label: Categorias em destaque
-        type: reference
+        type: select
         options:
-          collection: categories
           multiple: true
           min: 3
           max: 3
-          value: "{fields.slug}"
-          label: "{fields.name}"
-          search: "fields.name"
-        description: Escolha exatamente três categorias ativas, na ordem em que devem aparecer.
+          values:
+            - name: casamentos
+              label: Casamentos
+            - name: ensaios
+              label: Ensaios
+            - name: familia
+              label: Família
+            - name: newborn
+              label: Newborn
+            - name: eventos
+              label: Eventos
+        description: Escolha exatamente três categorias. A ordem de exibição segue a ordem do portfólio.
       - name: aboutTitle
         label: Título da seção sobre a Faby
         type: string
         description: Até 60 caracteres.
-      - name: aboutText
-        label: Texto sobre a Faby
+      - name: aboutSummary
+        label: Resumo sobre a Faby
         type: text
-        description: Até 600 caracteres. Deixe uma linha em branco entre parágrafos.
+        description: Até 400 caracteres. O texto completo fica na página Sobre.
 
-  - name: categories
-    label: Categorias
-    type: collection
-    path: content/categories
-    filename: "{fields.slug}.md"
-    view:
-      primary: name
-    fields:
-      - name: name
-        label: Nome
-        type: string
-      - name: slug
-        label: Slug
-        type: string
-        description: Letras minúsculas, números e hífens. Não altere depois de publicado.
-      - name: description
-        label: Descrição curta
-        type: text
-      - name: order
-        label: Ordem
-        type: number
-      - name: active
-        label: Ativa
-        type: boolean
-
-  - name: photos
-    label: Fotos
-    type: collection
-    path: content/photos
-    filename: "{fields.title}.md"
-    view:
-      primary: title
+  - name: sobre
+    label: Sobre
+    type: file
+    path: content/sobre/index.md
+    format: yaml-frontmatter
     fields:
       - name: title
-        label: Título interno
+        label: Título
         type: string
-      - name: alt
-        label: Texto alternativo
-        type: string
-        description: Descreva a foto para quem não pode vê-la. Máximo de 160 caracteres.
+      - name: intro
+        label: Introdução
+        type: text
+      - name: body
+        label: Texto de apresentação
+        type: rich-text
+        required: true
+        options:
+          format: markdown
+          media: false
       - name: image
-        label: Imagem
+        label: Retrato
         type: image
         options:
-          media: photos
-      - name: category
-        label: Categoria
-        type: reference
-        options:
-          collection: categories
-          value: "{fields.slug}"
-          label: "{fields.name}"
-          search: "fields.name"
-      - name: order
-        label: Ordem na categoria
-        type: number
-      - name: publishedAt
-        label: Data de publicação
+          media: sobre
+      - name: imageAlt
+        label: Texto alternativo do retrato
+        type: string
+      - name: updatedAt
+        label: Atualizado em
         type: date
-      - name: published
-        label: Publicada
-        type: boolean

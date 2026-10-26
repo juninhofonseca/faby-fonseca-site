@@ -1,13 +1,14 @@
 # Faby Fonseca Fotografia
 
-Site estático de portfólio fotográfico, com página inicial editável, galeria por categoria,
-visualização ampliada acessível e formulário de orçamento com consentimento LGPD.
+Site estático de portfólio fotográfico com identidade editorial, galeria em mosaico por categoria,
+página Sobre, formulário de orçamento com consentimento LGPD e edição de conteúdo pelo Pages CMS.
 
 ## Stack
 
 - [Astro](https://astro.build/) com saída estática e pipeline de imagens (`sharp`)
 - TypeScript e JavaScript vanilla (sem framework de UI)
 - Conteúdo em Markdown versionado no Git, editado pelo [Pages CMS](https://pagescms.org/)
+- Fontes Cormorant Garamond e Inter auto-hospedadas em `public/fonts/`
 - [Web3Forms](https://web3forms.com/) para entregar os pedidos de orçamento por e-mail
 - GitHub Pages para publicação
 - Playwright, axe-core e Lighthouse CI para qualidade
@@ -34,11 +35,12 @@ O servidor local fica em `http://localhost:4321`.
 | `npm run build` | Gera `dist/` e verifica o orçamento de imagens |
 | `npm run build:test` | Build com chave fictícia do Web3Forms, usado pelos testes |
 | `npm run preview` | Serve o build localmente |
+| `npm run generate:og` | Gera `public/og/default.jpg` a partir da foto do hero |
 | `npm run check` | Verificação de tipos e Astro |
-| `npm run validate:content` | Valida o Markdown de categorias e fotos |
+| `npm run validate:content` | Valida categorias, fotos, home, Sobre e a foto do hero |
 | `npm run check:images` | Valida originais e variantes de grade |
-| `npm run test:content` | Testes das regras de conteúdo |
-| `npm run test:e2e` | Playwright (galeria, lightbox, contato e acessibilidade) |
+| `npm run test:content` | Testes das regras de conteúdo e da identidade |
+| `npm run test:e2e` | Playwright em desktop 1280, tablet 768 e mobile 360 |
 | `npm run test:a11y` | Apenas os testes de acessibilidade |
 | `npm run test:lighthouse` | Lighthouse CI com metas de desempenho |
 
@@ -46,31 +48,45 @@ O servidor local fica em `http://localhost:4321`.
 
 ```text
 content/
+├── portfolio/
+│   └── <slug>/
+│       ├── index.md          # nome, slug, descrição, ordem, active e photos[]
+│       └── imagens/          # originais daquela categoria
 ├── home/
-│   ├── index.md               # destaque, três categorias, apresentação
-│   └── images/<arquivo>       # foto de destaque (separada do portfólio)
-├── categories/<slug>.md       # nome, slug, descrição, ordem, ativa
-└── photos/
-    ├── <slug>.md              # título, alt, imagem, categoria, ordem, data
-    └── images/<arquivo>       # originais enviados pela Faby
+│   ├── index.md              # hero, três categorias em destaque e resumo
+│   └── images/               # foto de destaque
+└── sobre/
+    ├── index.md              # título, introdução e corpo Markdown completo
+    └── images/               # retrato opcional
 ```
 
-As regras completas estão em
-[`specs/002-portfolio-gallery/contracts/content-schema.md`](specs/002-portfolio-gallery/contracts/content-schema.md)
-para o portfólio e em
-[`specs/004-home-destaque/contracts/home-content.md`](specs/004-home-destaque/contracts/home-content.md)
-para a página inicial.
+As cinco categorias são fixas nesta versão: `casamentos`, `ensaios`, `familia`, `newborn` e
+`eventos`. Cada foto é um item da lista `photos[]` do `index.md` da própria categoria, com imagem em
+`imagens/`. As regras completas estão em
+[`specs/005-tema-identidade/contracts/content.md`](specs/005-tema-identidade/contracts/content.md).
 
-## Página inicial e Instagram
+## Identidade visual
 
-A home lê `content/home/index.md` e é editável pelo Pages CMS como **Página inicial**: título e
-frase do destaque, foto e texto alternativo, três categorias em destaque e o texto sobre a Faby. A
-foto fica em `content/home/images/`, sem se misturar às fotos do portfólio. O passo a passo está em
-[`docs/admin.md`](docs/admin.md).
+A paleta e a tipografia vivem em `src/styles/tokens.css` e não são editáveis pelo painel:
 
-O perfil público do Instagram é `@faby.fonseca.fotografia`, definido em `src/lib/contact.ts` e
-exibido na home e no rodapé de todas as páginas. Não há feed embutido, script de terceiros nem
-cookie. Para trocar o perfil, altere a constante nesse arquivo.
+- fundo `#F7F3EE`, superfície `#EFE8DE`, texto `#2B2622`, apoio `#6B615A`;
+- marca `#B5715A` em detalhes, bordas e títulos grandes;
+- links, botões e texto pequeno usam o contraste acessível `#8E5238`;
+- títulos em Cormorant Garamond e corpo em Inter, servidas pelo próprio site.
+
+A imagem padrão de compartilhamento (`public/og/default.jpg`, 1200 × 630) é gerada localmente com
+`npm run generate:og` e versionada.
+
+## Página inicial, portfólio e Sobre
+
+- A home lê `content/home/index.md`: título e frase do destaque, foto real, texto alternativo, três
+  categorias em destaque, resumo da Faby e link para `/sobre/`.
+- O portfólio abre em “Todos” e permite filtrar por `?categoria=<slug>` sem recarregar a página,
+  preservando o botão voltar. O mosaico usa CSS columns, sem biblioteca de terceiros.
+- `/sobre/` exibe o texto completo de apresentação, editável no Pages CMS, com caminhos para o
+  portfólio e o orçamento.
+
+O passo a passo da administradora está em [`docs/admin.md`](docs/admin.md).
 
 ## Formulário de contato
 
@@ -98,8 +114,7 @@ não deve ser versionada com valor.
 ### Comportamento sem chave
 
 Sem `PUBLIC_WEB3FORMS_KEY` no build, a página de contato **não** exibe o formulário: mostra um painel
-com e-mail e WhatsApp, para não prometer um envio que não funciona. O mesmo vale se a variável for
-removida do repositório.
+com e-mail e WhatsApp, para não prometer um envio que não funciona.
 
 ### Envio e antispam
 
@@ -108,10 +123,8 @@ removida do repositório.
 - Sem JavaScript: `POST` nativo com redirecionamento para `/contato/enviado/`.
 - Antispam: campo oculto nativo (`botcheck`), honeypot próprio (`website`) e tempo mínimo de 3
   segundos. Nenhum captcha, cookie ou script de terceiros.
-- Limite do plano gratuito: 250 envios por mês.
 
-O fluxo operacional — onde os pedidos chegam, como responder, retenção, exclusão de dados e o que
-fazer se o limite estourar — está em [`docs/contato.md`](docs/contato.md).
+O fluxo operacional está em [`docs/contato.md`](docs/contato.md).
 
 ## Publicação
 
@@ -120,26 +133,24 @@ O deploy é feito pelo workflow `.github/workflows/deploy.yml` a cada push em `m
 1. Habilite o GitHub Pages em **Settings → Pages → GitHub Actions**.
 2. Confirme o domínio em `astro.config.mjs` (`site`).
 3. Se usar domínio próprio, configure o DNS e o certificado no GitHub Pages.
-4. Cadastre a variável `WEB3FORMS_KEY` (veja [Formulário de contato](#formulário-de-contato)) antes
-   do primeiro deploy com o formulário ativo.
+4. Cadastre a variável `WEB3FORMS_KEY` antes do primeiro deploy com o formulário ativo.
 
 Enquanto o domínio próprio não estiver apontado, o workflow compila com `SITE_URL` e `SITE_BASE`
-para publicar em `https://juninhofonseca.github.io/faby-fonseca-site/`. Ao ativar o domínio,
-remova essas variáveis do workflow e o site passa a usar `https://fabyfonseca.com.br` na raiz.
+para publicar em `https://juninhofonseca.github.io/faby-fonseca-site/`. Ao ativar o domínio, remova
+essas variáveis do workflow e o site passa a usar `https://fabyfonseca.com.br` na raiz.
 
 O repositório precisa ser público para usar o Pages e o Pages CMS no plano gratuito.
 
 ## Gestão de conteúdo
 
-A Faby publica e remove fotos e atualiza a página inicial pelo Pages CMS, sem editar código. O
-passo a passo está em [`docs/admin.md`](docs/admin.md). O dia a dia do formulário de orçamento está
-em [`docs/contato.md`](docs/contato.md).
+A Faby publica e remove fotos, edita a descrição das categorias e atualiza a home e a página Sobre
+pelo Pages CMS, sem editar código. O passo a passo está em [`docs/admin.md`](docs/admin.md) e o dia
+a dia do formulário em [`docs/contato.md`](docs/contato.md).
 
 ## Limites conhecidos
 
-- O limite de 10 MB por original e o formato suportado são verificados no workflow de publicação,
-  tanto para as fotos do portfólio quanto para a foto da home.
-- A foto de destaque da home é uma amostra provisória até a Faby enviar a definitiva pelo painel.
-- O plano gratuito do Web3Forms entrega até 250 pedidos por mês; acima disso o visitante vê o
-  contato direto.
-- A identidade visual está provisória em `src/styles/tokens.css`.
+- As cinco categorias são fixas nesta versão; criar uma sexta exige alteração de código.
+- O limite de 10 MB por original e o formato suportado são verificados no workflow de publicação.
+- O hero precisa ter largura e altura de pelo menos 2400 px e não pode ser o placeholder antigo.
+- As seis fotos atuais do portfólio são amostras; a foto do hero é a foto real aprovada.
+- O site continua na URL de projeto do GitHub Pages até a migração para o domínio próprio.

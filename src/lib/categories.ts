@@ -2,13 +2,16 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 
 export type Category = CollectionEntry<'categories'>;
 
+const EXPECTED_CATEGORIES = 5;
+
 /**
- * Retorna apenas categorias ativas, ordenadas por `order` e nome.
- * Também garante que não existam slugs duplicados.
+ * Retorna as categorias publicadas, ordenadas por `order` e nome.
+ * Também garante que existam exatamente cinco slugs únicos.
  */
 export async function getActiveCategories(): Promise<Category[]> {
   const categories = await getCollection('categories', ({ data }) => data.active);
   assertUniqueSlugs(categories);
+  assertCategoryCount(categories);
 
   return categories.sort(
     (a, b) =>
@@ -31,6 +34,14 @@ export function assertUniqueSlugs(categories: Category[]): void {
   }
 }
 
+export function assertCategoryCount(categories: Category[]): void {
+  if (categories.length !== EXPECTED_CATEGORIES) {
+    throw new Error(
+      `Esperadas exatamente ${EXPECTED_CATEGORIES} categorias ativas, encontradas ${categories.length}.`,
+    );
+  }
+}
+
 export function findCategoryBySlug(
   categories: Category[],
   slug: string | null | undefined,
@@ -40,12 +51,12 @@ export function findCategoryBySlug(
 }
 
 /**
- * Resolve a categoria pedida na URL. Slug ausente ou inválido cai na primeira
- * categoria ativa, conforme o contrato de navegação.
+ * Resolve a categoria pedida na URL. Slug ausente ou inválido significa
+ * “Todos” — nunca a primeira categoria.
  */
 export function resolveCategorySlug(
   categories: Category[],
   requested: string | null | undefined,
 ): Category | undefined {
-  return findCategoryBySlug(categories, requested) ?? categories[0];
+  return findCategoryBySlug(categories, requested);
 }

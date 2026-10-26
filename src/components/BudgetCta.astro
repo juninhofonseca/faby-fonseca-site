@@ -7,18 +7,13 @@ interface Props {
 }
 
 const { category } = Astro.props;
+const href = category
+  ? withBase(`/contato/?categoria=${category.data.slug}`)
+  : withBase('/contato/');
 ---
 
-{
-  category && (
-    <p class="budget-cta">
-      <a
-        class="button"
-        href={withBase(`/contato/?categoria=${category.data.slug}`)}
-        data-budget-cta
-      >
-        Quero um orçamento desta categoria
-      </a>
-    </p>
-  )
-}
+<p class="budget-cta">
+  <a class="button" href={href} data-budget-cta>
+    {category ? 'Quero um orçamento desta categoria' : 'Solicitar orçamento'}
+  </a>
+</p>

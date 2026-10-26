@@ -1,39 +1,28 @@
-import { getCollection, type CollectionEntry } from 'astro:content';
 import type { Category } from './categories';
+import { comparePhotoOrder } from './gallery-order.mjs';
 
-export type Photo = CollectionEntry<'photos'>;
+export type Photo = Category['data']['photos'][number];
 
 /** Ordena por `order` e desempata por data de publicação e título. */
 export function comparePhotos(a: Photo, b: Photo): number {
-  return (
-    a.data.order - b.data.order ||
-    a.data.publishedAt.getTime() - b.data.publishedAt.getTime() ||
-    a.data.title.localeCompare(b.data.title, 'pt-BR')
-  );
+  return comparePhotoOrder(a, b);
 }
 
 /** Fotos publicadas de uma categoria, na ordem de exibição. */
-export async function getPublishedPhotos(categorySlug: string): Promise<Photo[]> {
-  const photos = await getCollection(
-    'photos',
-    ({ data }) => data.published && data.category === categorySlug,
-  );
-
-  return photos.sort(comparePhotos);
+export function getPublishedPhotos(category: Category): Photo[] {
+  return [...category.data.photos].filter((photo) => photo.published).sort(comparePhotos);
 }
 
 /** Mapa slug da categoria → fotos publicadas ordenadas. */
-export async function getPhotosByCategory(
+export function getPhotosByCategory(
   categories: Category[],
-): Promise<Record<string, Photo[]>> {
-  const entries = await Promise.all(
-    categories.map(async (category) => {
-      const photos = await getPublishedPhotos(category.data.slug);
-      return [category.data.slug, photos] as const;
-    }),
+): Record<string, Photo[]> {
+  return Object.fromEntries(
+    categories.map((category) => [
+      category.data.slug,
+      getPublishedPhotos(category),
+    ]),
   );
-
-  return Object.fromEntries(entries);
 }
 
 /** Próximo índice em ciclo contínuo. */

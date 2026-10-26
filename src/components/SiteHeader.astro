@@ -1,0 +1,48 @@
+---
+import { withBase } from '../lib/urls';
+
+const currentPath = Astro.url.pathname;
+
+const navItems = [
+  { path: '/', label: 'Início', hook: 'inicio' },
+  { path: '/portfolio/', label: 'Portfólio', hook: 'portfolio' },
+  { path: '/contato/', label: 'Contato', hook: 'contato' },
+] as const;
+
+function isCurrent(path: string): boolean {
+  const href = withBase(path);
+  if (path === '/') return currentPath === href;
+  return currentPath === href || currentPath.startsWith(href);
+}
+---
+
+<header class="site-header" data-site-header>
+  <div class="container site-header__inner">
+    <a class="site-logo" href={withBase('/')} data-site-logo>
+      <span class="site-logo__name">Faby Fonseca</span>
+      <span class="site-logo__role">Fotografia</span>
+    </a>
+
+    <nav class="site-nav" aria-label="Navegação principal">
+      <ul role="list">
+        {
+          navItems.map((item) => (
+            <li>
+              <a
+                href={withBase(item.path)}
+                data-nav-link={item.hook}
+                aria-current={isCurrent(item.path) ? 'page' : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <a class="button button--ghost" href={withBase('/contato/')} data-header-cta>
+      Solicitar orçamento
+    </a>
+  </div>
+</header>

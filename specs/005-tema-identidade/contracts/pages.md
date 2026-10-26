@@ -90,7 +90,7 @@ Regras:
 - A foto do hero é a única imagem `loading="eager"` + `fetchpriority="high"`; as demais são lazy.
 - O hero usa `width`/`height` reais para reservar espaço (CLS 0).
 - A foto é exibida em retrato 3:4 com `object-fit: cover` e `object-position` ajustado para preservar
-  o assunto; ponto de partida `object-position: 72% center`, validado visualmente em 360 px e 1280 px,
+  o assunto; ponto de partida `object-position: 72% center`, validado visualmente em 360, 768 e 1280 px,
   sem cortar o rosto ou as mãos.
 - O cartão de categoria sem foto publicada mostra um fundo `--color-surface` com o nome, sem imagem
   quebrada.
@@ -131,7 +131,8 @@ Regras:
 - Cada seção mantém `h2` e descrição; categoria vazia mostra “Em breve novas fotos nesta categoria.”
 - O CTA de orçamento (`data-budget-cta`) aponta para `/contato/?categoria=<slug>` da categoria
   visível; sem filtro, aponta para `/contato/`.
-- O lightbox considera apenas os cartões da seção visível, na ordem do DOM.
+- O lightbox percorre apenas os cartões visíveis, na ordem do DOM: em “Todos”, todas as fotos; com
+  filtro, apenas as da seção visível.
 - A ordem do DOM é a ordem definida (`order`), mesmo que o CSS columns mude a posição visual.
 
 ### Lightbox (`Lightbox.astro` + `lightbox.client.ts`)

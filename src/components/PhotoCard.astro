@@ -5,16 +5,15 @@ import type { Photo } from '../lib/gallery';
 interface Props {
   photo: Photo;
   index: number;
-  eager?: boolean;
 }
 
-const { photo, index, eager = false } = Astro.props;
+const { photo, index } = Astro.props;
 
 const large = await getImage({
-  src: photo.data.image,
+  src: photo.image,
   width: 1600,
   format: 'webp',
-  quality: 78,
+  quality: 80,
 });
 ---
 
@@ -24,16 +23,16 @@ const large = await getImage({
   data-photo-card
   data-index={index}
   data-full-src={large.src}
-  data-alt={photo.data.alt}
-  data-title={photo.data.title}
+  data-alt={photo.alt}
+  data-title={photo.title}
 >
   <Image
-    src={photo.data.image}
-    alt={photo.data.alt}
-    widths={[480, 960]}
+    src={photo.image}
+    alt={photo.alt}
+    widths={[480, 960, 1440]}
     sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 33vw"
-    loading={eager ? 'eager' : 'lazy'}
-    fetchpriority={eager ? 'high' : 'auto'}
+    loading="lazy"
     class="photo-card__image"
   />
+  <span class="photo-card__caption">{photo.title}</span>
 </a>

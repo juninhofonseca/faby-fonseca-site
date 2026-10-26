@@ -164,6 +164,8 @@ um teste de build antes de migrar as seis fotos.
 - `media`: cinco fontes nomeadas (`portfolio-casamentos`, etc.) com `input:
   content/portfolio/<slug>/imagens`, `output: imagens`, `rename: safe`, extensões de imagem.
 - Home e Sobre continuam como arquivos únicos (`type: file`), com mídia própria para o hero.
+- `featuredCategories` da home usa `select` múltiplo com as cinco categorias fixas; `reference` foi
+  descartado porque a coleção `categories` deixou de existir.
 
 **Motivo**: o Pages CMS permite listas de objetos com campo de imagem e permite escolher a fonte de
 mídia por campo, mas **não** escolhe a fonte dinamicamente pelo valor de outro campo. Uma fonte por
@@ -249,8 +251,8 @@ inexistente; axe-core cobre a seção oculta.
 
 **Decisão**:
 
-- Criar `content/sobre/index.md` (coleção `sobre`, entrada única) com `title`, `intro`, `body`
-  (Markdown) e `image`/`imageAlt` opcionais.
+- Criar `content/sobre/index.md` (coleção `sobre`, entrada única) com `title`, `intro`, corpo Markdown
+  (`body`, chave especial do CMS) e `image`/`imageAlt` opcionais.
 - `src/pages/sobre.astro` renderiza o texto completo em `<article>`, com links para `/portfolio/` e
   `/contato/`.
 - A home mantém `aboutTitle`, `aboutSummary` (até 400 caracteres) e um link “Conhecer a Faby” para
@@ -275,8 +277,8 @@ resumo da home existe e que `/sobre/` não está vazio.
 **Decisão**: validar o hero no build com regras explícitas:
 
 - Arquivo existe, extensão `jpg`, `jpeg`, `png` ou `webp`, ≤ 10 MB.
-- Lado maior ≥ 2400 px **e** altura suficiente para a exibição em retrato 3:4 (altura ≥ 2400 px),
-  com recorte que preserve o assunto.
+- Largura ≥ 2400 px **e** altura ≥ 2400 px, com recorte que preserve o assunto na exibição em
+  retrato 3:4.
 - `alt` obrigatório, 1–160 caracteres, descrevendo a imagem **publicada**.
 - O build falha se o arquivo não atender às dimensões, se faltar `alt` ou se o hash corresponder a um
   placeholder conhecido. A aprovação editorial da foto (é a Faby? o recorte preserva o assunto?) é
@@ -413,7 +415,7 @@ variáveis, então a migração futura é uma mudança de configuração. A dív
 |---|---|---|
 | Conteúdo | Node test + scripts | schema da categoria, `photos[]`, hero ≥ 2400 px, contraste, ausência de roxo |
 | Build | Astro check + build | tipos, imagens, orçamento de 300 KB |
-| E2E | Playwright (desktop 1280 + mobile 360) | header/CTA, home, `/sobre/`, mosaico, filtro, lightbox, contato, privacidade |
+| E2E | Playwright (desktop 1280 + tablet 768 + mobile 360) | header/CTA, home, `/sobre/`, mosaico, filtro, lightbox, contato, privacidade |
 | A11y | axe-core | todas as páginas, incluindo `/sobre/` |
 | Performance | Lighthouse CI | `/`, `/portfolio/`, `/contato/`, `/sobre/`, `/privacidade/` em 4G |
 

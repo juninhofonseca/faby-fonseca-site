@@ -14,5 +14,9 @@ export default defineConfig({
   base,
   output: 'static',
   build: { format: 'directory' },
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      filter: (page) => !page.endsWith('/contato/enviado/'),
+    }),
+  ],
 });

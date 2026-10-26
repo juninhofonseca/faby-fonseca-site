@@ -3,16 +3,23 @@ import assert from 'node:assert/strict';
 import {
   MAX_GRID_BYTES,
   MAX_ORIGINAL_BYTES,
+  assertActiveCategoryCount,
   assertAlt,
   assertCategory,
   assertFeaturedCategories,
+  assertHeroDimensions,
+  assertSlugMatchesFolder,
+  assertSobreBody,
   exceedsGridBudget,
   exceedsLimit,
   findDuplicateSlugs,
+  isDotfile,
   isGridVariant,
+  isKnownPlaceholderHash,
   isSupportedImage,
   parseSrcSet,
 } from '../../scripts/content-rules.mjs';
+import { comparePhotoOrder } from '../../src/lib/gallery-order.mjs';
 
 test('rejeita texto alternativo vazio', () => {
   assert.throws(() => assertAlt(''), /obrigatório/);
@@ -124,4 +131,74 @@ test('rejeita slug inválido em categoria em destaque', () => {
       ),
     /slugs válidos/,
   );
+});
+
+test('rejeita corpo do Sobre vazio ou acima do limite', () => {
+  assert.throws(() => assertSobreBody(''), /obrigatório/);
+  assert.throws(() => assertSobreBody('   '), /obrigatório/);
+  assert.throws(() => assertSobreBody('a'.repeat(4001)), /4000/);
+  assert.equal(assertSobreBody('Texto válido.'), 'Texto válido.');
+});
+
+test('exige largura e altura mínimas de 2400 px no hero', () => {
+  assert.doesNotThrow(() => assertHeroDimensions(4898, 3266));
+  assert.throws(() => assertHeroDimensions(2399, 3266), /largura e altura/);
+  assert.throws(() => assertHeroDimensions(4898, 2399), /largura e altura/);
+});
+
+test('exige exatamente cinco categorias ativas', () => {
+  const five = Array.from({ length: 5 }, (_, index) => ({
+    slug: `categoria-${index}`,
+    active: true,
+  }));
+
+  assert.equal(assertActiveCategoryCount(five).length, 5);
+  assert.throws(() => assertActiveCategoryCount(five.slice(0, 4)), /exatamente 5/);
+  assert.throws(
+    () => assertActiveCategoryCount([...five, { slug: 'extra', active: true }]),
+    /exatamente 5/,
+  );
+});
+
+test('exige slug igual ao nome da pasta', () => {
+  assert.doesNotThrow(() => assertSlugMatchesFolder('casamentos', 'casamentos'));
+  assert.throws(() => assertSlugMatchesFolder('casamento', 'casamentos'), /nome da pasta/);
+});
+
+test('identifica arquivos iniciados por ponto', () => {
+  assert.equal(isDotfile('.gitkeep'), true);
+  assert.equal(isDotfile('foto.jpg'), false);
+});
+
+test('reconhece o hash do placeholder provisório', () => {
+  assert.equal(
+    isKnownPlaceholderHash(
+      '67d6c4a1ca5d5913ad77649cefdee41b77dfd8ac36e36b4210c2ee561af3f315',
+    ),
+    true,
+  );
+  assert.equal(isKnownPlaceholderHash('0'.repeat(64)), false);
+});
+
+test('ordena fotos por order, data e título', () => {
+  const first = { order: 10, publishedAt: new Date('2026-09-12'), title: 'B' };
+  const second = { order: 10, publishedAt: new Date('2026-09-13'), title: 'A' };
+  const third = { order: 20, publishedAt: undefined, title: 'C' };
+
+  assert.ok(comparePhotoOrder(first, second) < 0);
+  assert.deepEqual([third, second, first].sort(comparePhotoOrder), [first, second, third]);
+});
+
+test('foto sem publishedAt conta como 0 no desempate', () => {
+  const dated = { order: 10, publishedAt: new Date('2026-01-01'), title: 'A' };
+  const undated = { order: 10, publishedAt: undefined, title: 'B' };
+
+  assert.ok(comparePhotoOrder(undated, dated) < 0);
+});
+
+test('título decide quando order e data empatam', () => {
+  const a = { order: 10, publishedAt: new Date('2026-01-01'), title: 'A' };
+  const b = { order: 10, publishedAt: new Date('2026-01-01'), title: 'B' };
+
+  assert.ok(comparePhotoOrder(a, b) < 0);
 });

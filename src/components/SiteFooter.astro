@@ -1,0 +1,50 @@
+---
+import { withBase } from '../lib/urls';
+import {
+  CONTACT_EMAIL,
+  INSTAGRAM_HANDLE,
+  INSTAGRAM_URL,
+  buildMailtoHref,
+  buildWhatsappHref,
+} from '../lib/contact';
+
+const emailHref = buildMailtoHref();
+const whatsappHref = buildWhatsappHref();
+---
+
+<footer class="site-footer" data-site-footer>
+  <div class="container site-footer__inner">
+    <p class="site-footer__brand">Faby Fonseca Fotografia</p>
+
+    <ul class="site-footer__links" role="list">
+      <li>
+        <a href={emailHref}>{CONTACT_EMAIL}</a>
+      </li>
+      <li>
+        <a href={whatsappHref} target="_blank" rel="noopener noreferrer">WhatsApp</a>
+      </li>
+      <li>
+        <a
+          href={INSTAGRAM_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-footer-instagram
+        >
+          @{INSTAGRAM_HANDLE}
+        </a>
+      </li>
+      <li>
+        <a href={withBase('/sobre/')} data-footer-link="sobre">Sobre</a>
+      </li>
+      <li>
+        <a href={withBase('/privacidade/')} data-footer-link="privacidade">
+          Política de Privacidade
+        </a>
+      </li>
+    </ul>
+
+    <p class="site-footer__legal">
+      © {new Date().getFullYear()} Faby Fonseca Fotografia. Todos os direitos reservados.
+    </p>
+  </div>
+</footer>

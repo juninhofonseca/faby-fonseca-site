@@ -8,10 +8,21 @@ interface Props {
 }
 
 const { categories, activeSlug } = Astro.props;
+const todosActive = !activeSlug;
 ---
 
-<nav class="category-nav" aria-label="Categorias do portfólio">
+<nav class="category-nav" aria-label="Filtrar por categoria">
   <ul role="list">
+    <li>
+      <a
+        href={withBase('/portfolio/')}
+        class:list={['category-link', { 'is-active': todosActive }]}
+        aria-current={todosActive ? 'page' : undefined}
+        data-category-link="todos"
+      >
+        Todos
+      </a>
+    </li>
     {
       categories.map((category) => {
         const isActive = category.data.slug === activeSlug;

@@ -5,14 +5,18 @@ import {
   exceedsGridBudget,
   exceedsLimit,
   formatBytes,
+  isDotfile,
   isGridVariant,
   isSupportedImage,
   parseSrcSet,
 } from './content-rules.mjs';
 
 const root = process.cwd();
+const portfolioDir = path.join(root, 'content', 'portfolio');
 const originalsDirs = [
-  path.join(root, 'content', 'photos', 'images'),
+  ...(await readdir(portfolioDir, { withFileTypes: true }))
+    .filter((entry) => entry.isDirectory() && !isDotfile(entry.name))
+    .map((entry) => path.join(portfolioDir, entry.name, 'imagens')),
   path.join(root, 'content', 'home', 'images'),
 ];
 const distDir = path.join(root, 'dist');
@@ -36,6 +40,8 @@ async function walk(directory) {
   const files = [];
 
   for (const entry of entries) {
+    if (isDotfile(entry.name)) continue;
+
     const fullPath = path.join(directory, entry.name);
     if (entry.isDirectory()) {
       files.push(...(await walk(fullPath)));

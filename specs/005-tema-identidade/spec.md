@@ -39,8 +39,9 @@ mesmo cuidado que a Faby coloca no trabalho.
 **Por que esta prioridade**: a primeira impressão define se o visitante confia no trabalho. A
 identidade provisória atual não comunica o posicionamento da marca.
 
-**Teste independente**: abrir `/`, `/portfolio/`, `/contato/`, `/sobre/` e `/privacidade/` em 360 px
-e 1280 px, conferir a paleta, as duas famílias tipográficas, o contraste e a ausência de roxo.
+**Teste independente**: abrir `/`, `/portfolio/`, `/contato/` e `/privacidade/` em 360 px, 768 px e
+1280 px, conferir a paleta, as duas famílias tipográficas, o contraste e a ausência de roxo. A página
+`/sobre/` é validada na US4, quando passa a existir.
 
 **Cenários de aceite**:
 
@@ -224,9 +225,9 @@ texto da home no painel; conferir o resultado depois do deploy.
   da Faby com link para `/sobre/` e as chamadas para portfólio e orçamento — com a nova identidade
   visual.
 - **FR-005**: A home deve exibir uma fotografia real da Faby no hero, fornecida pela responsável, com
-  pelo menos 2400 px no lado maior, exibida em orientação retrato sem recorte que remova o assunto, e
-  texto alternativo descrevendo a imagem atual; o placeholder provisório não pode permanecer na
-  versão publicada.
+  largura e altura de pelo menos 2400 px, exibida em orientação retrato sem recorte que remova o
+  assunto, e texto alternativo descrevendo a imagem atual; o placeholder provisório não pode
+  permanecer na versão publicada.
 - **FR-006**: A página de portfólio deve apresentar as cinco categorias (Casamentos, Ensaios,
   Família, Newborn e Eventos) em mosaico contínuo, na ordem definida, cada uma com nome, descrição
   curta e suas fotos.
@@ -250,9 +251,9 @@ texto da home no painel; conferir o resultado depois do deploy.
   a data de vigência deve ser atualizada.
 - **FR-014**: O site não deve exibir comentários, seletor de idioma, modo escuro, textos, nomes ou
   imagens de demonstração do tema.
-- **FR-015**: Todas as páginas devem ter título e descrição próprios, canônicos, Open Graph
-  (título, descrição, imagem e tipo) e constar no sitemap; deve existir uma imagem padrão de
-  compartilhamento com a identidade da marca.
+- **FR-015**: Todas as páginas indexáveis devem ter título e descrição próprios, canônicos, Open Graph
+  (título, descrição, imagem e tipo) e constar no sitemap; `/contato/enviado/`, por ser `noindex`, fica
+  fora do sitemap; deve existir uma imagem padrão de compartilhamento com a identidade da marca.
 - **FR-016**: Os endereços atuais devem continuar funcionando — `/`, `/portfolio/`, `/contato/`,
   `/contato/enviado/`, `/privacidade/` e `/portfolio/?categoria=<slug>` — e `/sobre/` deve ser
   adicionado sem quebrar links existentes.
@@ -265,19 +266,21 @@ texto da home no painel; conferir o resultado depois do deploy.
 - **FR-020**: Nenhuma dependência de framework de UI pode ser adicionada; a implementação usa Astro,
   HTML e CSS já existentes.
 - **FR-021**: A edição pelo Pages CMS deve continuar disponível para categorias, fotos e textos da
-  home, agora com cada categoria organizada como uma pasta que reúne sua descrição curta e suas
-  fotos.
+  home e da página Sobre, agora com cada categoria organizada como uma pasta que reúne sua descrição
+  curta e suas fotos.
 - **FR-022**: A validação de conteúdo deve continuar bloqueando publicação inválida: imagem sem
-  `alt`, categoria inexistente, arquivo ausente, formato não suportado, original acima de 10 MB e
-  variante de listagem acima de 300 KB.
+  `alt`, categoria inexistente ou fora das cinco, arquivo ausente, formato não suportado, original
+  acima de 10 MB, variante de listagem acima de 300 KB, hero com largura ou altura abaixo de
+  2400 px ou placeholder conhecido, corpo do Sobre vazio ou acima de 4000 caracteres e
+  `featuredCategories` inválidas.
 
 ### Entidades-Chave *(incluir se a funcionalidade envolver dados)*
 
 - **Identidade visual**: paleta de cinco cores e uma variação acessível do destaque, duas famílias
   tipográficas (Cormorant Garamond e Inter), logo em texto e regras de uso do destaque; centralizada
   para permitir ajuste com a Faby sem reescrever páginas.
-- **Categoria**: nome, slug, descrição curta, ordem, situação (ativa/inativa) e o conjunto de fotos
-  daquela categoria.
+- **Categoria**: nome, slug, descrição curta, ordem, situação (sempre publicada nesta versão) e o
+  conjunto de fotos daquela categoria.
 - **Foto**: imagem original, texto alternativo, título interno, categoria, ordem e data de publicação.
 - **Página institucional**: conteúdo editável da home e da página Sobre (títulos, textos, foto de
   destaque e categorias em destaque).
@@ -298,13 +301,13 @@ texto da home no painel; conferir o resultado depois do deploy.
 - **SC-004**: 0 imagens publicadas sem texto alternativo e 0 variantes de listagem acima de 300 KB.
 - **SC-005**: As cinco categorias aparecem no portfólio e 100% dos filtros abrem a categoria correta.
 - **SC-006**: 100% dos endereços atuais continuam respondendo e nenhum link interno quebra; a página
-  Sobre responde em `/sobre/` e consta no sitemap.
+  Sobre responde em `/sobre/` e consta no sitemap, e `/contato/enviado/` não consta no sitemap.
 - **SC-007**: 0 elementos de demonstração do tema, comentários, seletor de idioma ou modo escuro
   aparecem no site publicado.
 - **SC-008**: O site funciona em 360, 768 e 1280 px sem rolagem horizontal e com alvos de toque de
   pelo menos 44 × 44 px.
-- **SC-009**: A foto do hero é uma fotografia real da Faby, com pelo menos 2400 px no lado maior e
-  texto alternativo que a descreve; o placeholder provisório não aparece no site publicado.
+- **SC-009**: A foto do hero é uma fotografia real da Faby, com largura e altura de pelo menos 2400 px
+  e texto alternativo que a descreve; o placeholder provisório não aparece no site publicado.
 - **SC-010**: A Política de Privacidade descreve o formulário, o serviço de envio, os direitos do
   titular e a ausência de analytics, cookies e rastreadores, com data de vigência atualizada.
 
@@ -328,9 +331,10 @@ texto da home no painel; conferir o resultado depois do deploy.
 - A paleta é um ponto de partida ajustável com a Faby, mas não é um campo do painel: vive nos tokens
   de estilo para manter consistência. `#B5715A` permanece como cor de marca e `#8E5238` é a variação
   acessível usada em texto pequeno, links e botões.
-- A foto do hero está aprovada: `content/home/images/hero-home.jpg`, colorida, 4898 × 3266 px, com
-  exibição em recorte retrato 3:4 que preserva o assunto. O placeholder anterior não é aceito na
-  versão final. A referência em preto e branco de 640 × 960 px serviu apenas de enquadramento.
+- A foto do hero está aprovada: `content/home/images/hero-home.jpg`, colorida, 4898 × 3266 px
+  (largura e altura ≥ 2400 px), com exibição em recorte retrato 3:4 que preserva o assunto. O
+  placeholder anterior não é aceito na versão final. A referência em preto e branco de 640 × 960 px
+  serviu apenas de enquadramento.
 - O e-mail de contato continua `juninho.fonseca@gmail.com`; a troca para um endereço da Faby exige
   atualizar também a chave do Web3Forms e a política.
 - Não haverá analytics; a política afirma isso de forma explícita.

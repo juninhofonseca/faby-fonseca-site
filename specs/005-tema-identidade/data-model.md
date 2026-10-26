@@ -38,14 +38,14 @@ Arquivo: `content/portfolio/<slug>/index.md` (coleção Astro `categories`, uma 
 | `slug` | texto | sim | `^[a-z0-9]+(?:-[a-z0-9]+)*$`; igual ao nome da pasta; único | filtro `?categoria=` |
 | `description` | texto | sim | 1–160 caracteres | descrição curta sob o `h2` |
 | `order` | inteiro | sim | ≥ 0; único na prática | ordem das seções e do menu |
-| `active` | booleano | sim | padrão `true` | categoria publicada ou oculta |
+| `active` | booleano | sim | sempre `true` nesta versão; somente leitura no painel | categoria sempre publicada |
 | `photos` | lista de Foto | não (padrão `[]`) | pode ser vazia | mosaico da categoria |
 
 Regras:
 
 - O `slug` não pode ser alterado depois de publicado (quebra links e mídia).
-- `active: false` remove a categoria do portfólio, da home e do formulário de contato, sem apagar as
-  fotos.
+- Nesta versão não há desativação: `active` é sempre `true`, somente leitura no painel, e as cinco
+  categorias permanecem publicadas.
 - Categoria sem fotos aparece com nome, descrição e mensagem “Em breve novas fotos nesta categoria.”,
   nunca como área vazia.
 - A ordem de exibição é `order`, desempatada por `name` (`pt-BR`).
@@ -67,7 +67,8 @@ Regras:
 
 - `image` resolve relativo ao `index.md` da categoria; o arquivo precisa existir.
 - Toda foto publicada tem `alt`; foto sem `alt` bloqueia o build (FR-009/FR-022).
-- A ordem de exibição é `order`, desempatada por `publishedAt` e `title`.
+- A ordem de exibição é `order`, desempatada por `publishedAt` e `title`; foto sem `publishedAt`
+  conta como `0` no desempate.
 - A listagem usa no máximo 300 KB por variante (FR-010); o original pode ter até 10 MB.
 - O mosaico não recorta a imagem: a proporção original é preservada.
 
@@ -79,9 +80,9 @@ Arquivo: `content/home/index.md` (coleção Astro `home`, entrada `index`).
 |---|---|---|---|---|
 | `heroTitle` | texto | sim | 1–80 caracteres | único `h1` da home |
 | `heroText` | texto | sim | 1–240 caracteres | frase de apresentação |
-| `heroImage` | imagem | sim | `images/<arquivo>`; lado maior ≥ 2400 px e altura ≥ 2400 px; ≤ 10 MB | foto real aprovada da Faby |
+| `heroImage` | imagem | sim | `images/<arquivo>`; largura ≥ 2400 px e altura ≥ 2400 px; ≤ 10 MB | foto real aprovada da Faby |
 | `heroAlt` | texto | sim | 1–160 caracteres | descreve a foto atual |
-| `featuredCategories` | lista de slugs | sim | exatamente 3, distintos, ativos | cartões de categoria |
+| `featuredCategories` | lista de slugs | sim | exatamente 3, distintos, ativos; exibição por `order` da categoria | cartões de categoria |
 | `aboutTitle` | texto | sim | 1–60 caracteres | `h2` do resumo |
 | `aboutSummary` | texto | sim | 1–400 caracteres | resumo da apresentação |
 
@@ -91,7 +92,7 @@ Regras:
 - O link “Conhecer a Faby” aponta para `/sobre/` e existe mesmo sem JavaScript.
 - `heroImage` é o único candidato a LCP; recebe `loading="eager"`, `fetchpriority="high"` e
   dimensões explícitas.
-- Enquanto o arquivo tiver lado maior < 2400 px, altura < 2400 px ou o hash for de um placeholder
+- Enquanto o arquivo tiver largura < 2400 px, altura < 2400 px ou o hash for de um placeholder
   conhecido, o build falha (FR-005/SC-009). A aprovação editorial da foto e do recorte é registrada no
   checklist de release. A exibição é retrato 3:4 com recorte que preserva o assunto; a amostra de
   640 × 960 citada na spec é referência histórica de enquadramento, não conteúdo publicável.
@@ -104,14 +105,15 @@ Arquivo: `content/sobre/index.md` (coleção Astro `sobre`, entrada `index`).
 |---|---|---|---|---|
 | `title` | texto | sim | 1–80 caracteres | `h1` da página |
 | `intro` | texto | sim | 1–240 caracteres | parágrafo de abertura |
-| `body` | Markdown | sim | 1–4000 caracteres | texto completo da apresentação |
+| `body` (corpo Markdown) | Markdown | sim | 1–4000 caracteres; lido de `entry.body`, não é campo do frontmatter | texto completo da apresentação |
 | `image` | imagem | não | `images/<arquivo>`; ≤ 10 MB | retrato opcional |
 | `imageAlt` | texto | condicional | obrigatório se `image` existir; 1–160 caracteres | `alt` do retrato |
 | `updatedAt` | data | não | ISO `AAAA-MM-DD` | exibida como “Atualizado em” |
 
 Regras:
 
-- O texto é o mesmo já publicado no site atual, em pt-BR, sem dados inventados.
+- O texto é o mesmo já publicado no site atual, em pt-BR, sem dados inventados; o `intro` reaproveita
+  a primeira frase de `heroText`.
 - A página termina com links para `/portfolio/` e `/contato/` (FR-011).
 - Se `image` existir, `imageAlt` é obrigatório; o retrato é opcional para não bloquear a entrega.
 
@@ -183,12 +185,13 @@ Regras:
 
 - Nenhuma página fica sem `og:image`; o fallback é a imagem padrão da marca.
 - `/contato/enviado/` continua `noindex`.
-- Todas as páginas públicas constam no sitemap, incluindo `/sobre/`.
+- Todas as páginas indexáveis constam no sitemap, incluindo `/sobre/`; `/contato/enviado/` fica fora
+  dele.
 
 ## Relações
 
 - Categoria 1 — N Foto (embutida).
-- Home N — 3 Categoria (por `slug`, na ordem de `featuredCategories`).
+- Home N — 3 Categoria (por `slug`; exibição na ordem `order` da categoria).
 - Contato N — N Categoria (o formulário lista categorias ativas; o link do portfólio pré-seleciona).
 - Página Sobre é independente; não referencia categoria.
 - Identidade visual é global e não tem relação com conteúdo.
@@ -213,15 +216,17 @@ imagem. Preservar em cada categoria: `name`, `slug`, `description`, `order`, `ac
 3. Toda foto publicada tem `alt` não vazio (≤ 160 caracteres) e `image` existente.
 4. Toda imagem tem extensão suportada e original ≤ 10 MB.
 5. Nenhuma variante de listagem passa de 300 KB.
-6. O hero existe, tem lado maior e altura ≥ 2400 px, é exibido em retrato 3:4 preservando o assunto
+6. O hero existe, tem largura e altura ≥ 2400 px, é exibido em retrato 3:4 preservando o assunto
    e tem `alt` descritivo.
-7. `/sobre/` tem `title`, `intro` e `body` não vazios; `imageAlt` existe se houver `image`.
+7. `/sobre/` tem `title`, `intro` e corpo Markdown (`body`) não vazios; `imageAlt` existe se houver
+   `image`.
 8. Todos os pares de cor usados atingem o contraste mínimo (AA; 3:1 para texto grande e bordas).
 9. Nenhuma cor roxa da identidade padrão aparece em CSS ou HTML publicado.
 10. Nenhum texto, imagem ou classe de demonstração do tema é publicado.
 11. As URLs `/`, `/portfolio/`, `/contato/`, `/contato/enviado/`, `/privacidade/`, `/sobre/` e
     `/portfolio/?categoria=<slug>` respondem.
 12. Nenhuma página pública fica sem `title`, `description`, canônico e `og:image`.
+13. O sitemap inclui `/sobre/` e não inclui `/contato/enviado/`.
 
 Falha em qualquer invariante interrompe o build com o arquivo e o campo responsáveis na mensagem. O
 deploy não acontece e o site anterior continua no ar.

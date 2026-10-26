@@ -20,21 +20,25 @@ const { name, slug, description } = category.data;
     data-home-category={slug}
   >
     {
-      photo && (
+      photo ? (
         <Image
-          src={photo.data.image}
-          alt={photo.data.alt}
+          src={photo.image}
+          alt={photo.alt}
           widths={[400, 800]}
           sizes="(max-width: 767px) 100vw, 33vw"
           loading="lazy"
           class="home-category-card__image"
         />
+      ) : (
+        <span class="home-category-card__placeholder" aria-hidden="true">
+          {name}
+        </span>
       )
     }
-    <div class="home-category-card__body">
+    <span class="home-category-card__body">
       <h3>{name}</h3>
-      {description && <p class="home-category-card__description">{description}</p>}
+      <span class="home-category-card__description">{description}</span>
       <span class="home-category-card__cta">Ver trabalhos</span>
-    </div>
+    </span>
   </a>
 </li>

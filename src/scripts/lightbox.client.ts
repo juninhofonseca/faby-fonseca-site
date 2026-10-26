@@ -17,14 +17,10 @@ if (dialog) {
   let failed = new Set<number>();
 
   function getVisibleCards(): HTMLAnchorElement[] {
-    const section = document.querySelector<HTMLElement>(
-      '[data-gallery-section]:not([hidden])',
-    );
-
-    if (!section) return [];
-
     return Array.from(
-      section.querySelectorAll<HTMLAnchorElement>('[data-photo-card]'),
+      document.querySelectorAll<HTMLAnchorElement>(
+        '[data-gallery-section]:not([hidden]) [data-photo-card]',
+      ),
     );
   }
 

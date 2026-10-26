@@ -10,9 +10,7 @@ test.describe('Página inicial', () => {
     await expect(hero.getByRole('heading', { level: 1 })).toHaveText(
       'Histórias reais, registradas com sensibilidade',
     );
-    await expect(hero).toContainText(
-      'Casamentos, ensaios, família, newborn e eventos.',
-    );
+    await expect(hero).toContainText('Casamentos, ensaios, família, newborn e eventos.');
 
     await expect(page.locator('[data-home-cta="portfolio"]')).toHaveAttribute(
       'href',
@@ -33,6 +31,25 @@ test.describe('Página inicial', () => {
     );
   });
 
+  test('exibe o cabeçalho com logo, menu e CTA acessível', async ({ page }) => {
+    await page.goto('/');
+
+    const header = page.locator('[data-site-header]');
+    await expect(header.locator('.site-logo__name')).toHaveText('Faby Fonseca');
+    await expect(header.locator('.site-logo__role')).toHaveText('Fotografia');
+    await expect(header.getByRole('link', { name: 'Início' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    await expect(header.getByRole('link', { name: 'Portfólio' })).toBeVisible();
+    await expect(header.getByRole('link', { name: 'Contato' })).toBeVisible();
+
+    const cta = page.locator('[data-header-cta]');
+    await expect(cta).toHaveAttribute('href', '/contato/');
+    const box = await cta.boundingBox();
+    expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+  });
+
   test('carrega a foto de destaque com prioridade, dimensões e alt', async ({
     page,
   }) => {
@@ -40,7 +57,7 @@ test.describe('Página inicial', () => {
 
     const image = page.locator('[data-home-hero-media] img');
     await expect(image).toBeVisible();
-    await expect(image).toHaveAttribute('alt', /Foto provisória/);
+    await expect(image).toHaveAttribute('alt', /Retrato colorido de Faby Fonseca/);
     await expect(image).toHaveAttribute('loading', 'eager');
     await expect(image).toHaveAttribute('fetchpriority', 'high');
     await expect(image).toHaveAttribute('width', /^\d+$/);
@@ -50,9 +67,7 @@ test.describe('Página inicial', () => {
     expect(srcset).toContain('480w');
   });
 
-  test('mostra exatamente três categorias em destaque na ordem', async ({
-    page,
-  }) => {
+  test('mostra exatamente três categorias em destaque na ordem', async ({ page }) => {
     await page.goto('/');
 
     const cards = page.locator('[data-home-category]');
@@ -104,21 +119,21 @@ test.describe('Página inicial', () => {
     );
   });
 
-  test('apresenta a seção sobre a Faby com parágrafos', async ({ page }) => {
+  test('apresenta o resumo da Faby com link para a página Sobre', async ({ page }) => {
     await page.goto('/');
 
     const about = page.locator('[data-home-about]');
-    await expect(about.getByRole('heading', { level: 2 })).toHaveText(
-      'Sobre a Faby',
-    );
-    await expect(about.locator('p.home-about__text')).toHaveCount(2);
+    await expect(about.getByRole('heading', { level: 2 })).toHaveText('Sobre a Faby');
+    await expect(about.locator('p.home-about__text')).toHaveCount(1);
     await expect(about).toContainText('A fotografia é a minha forma de guardar');
+
+    const link = page.locator('[data-home-sobre-link]');
+    await expect(link).toHaveAttribute('href', '/sobre/');
+    await expect(link).toContainText('Conhecer a Faby');
   });
 
-  test('linka o Instagram na home e no rodapé de todas as páginas', async ({
-    page,
-  }) => {
-    for (const route of ['/', '/portfolio/', '/contato/']) {
+  test('linka o Instagram na home e no rodapé de todas as páginas', async ({ page }) => {
+    for (const route of ['/', '/portfolio/', '/contato/', '/sobre/', '/privacidade/']) {
       await page.goto(route);
 
       const footerLink = page.locator('[data-footer-instagram]');
@@ -159,15 +174,14 @@ test.describe('Página inicial', () => {
     expect(alts.every((alt) => Boolean(alt && alt.trim()))).toBe(true);
   });
 
-  test('não cria rolagem horizontal em 360, 768 e 1280 px', async ({ page }) => {
-    for (const width of [360, 768, 1280]) {
+  test('não cria rolagem horizontal em 360, 640, 768 e 1280 px', async ({ page }) => {
+    for (const width of [360, 640, 768, 1280]) {
       await page.setViewportSize({ width, height: 800 });
       await page.goto('/');
 
       const overflow = await page.evaluate(
         () =>
-          document.documentElement.scrollWidth -
-          document.documentElement.clientWidth,
+          document.documentElement.scrollWidth - document.documentElement.clientWidth,
       );
 
       expect(overflow, `largura ${width}px`).toBeLessThanOrEqual(1);
@@ -186,6 +200,7 @@ test.describe('Página inicial', () => {
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await expect(page.locator('[data-home-category]')).toHaveCount(3);
     await expect(page.locator('[data-instagram-link]')).toBeVisible();
+    await expect(page.locator('[data-home-sobre-link]')).toBeVisible();
     await expect(page.locator('[data-home-cta="orcamento-final"]')).toBeVisible();
 
     await context.close();

@@ -456,3 +456,146 @@ anterior continua no ar.
 2. **Foto definitiva da Faby** — o placeholder atual (amostra da cerimônia) deve ser substituído pela
    foto real pelo painel, atualizando o texto alternativo junto.
 3. **Identidade visual e domínio próprio** — continuam provisórios, como nas features anteriores.
+
+---
+
+# Validação — Identidade Visual e Portfólio Centrado na Galeria
+
+**Feature**: `005-tema-identidade` | **Data**: 2026-10-25
+**Ambiente**: Windows 11, Node.js v24.19.0, npm 11.17.0, Astro 7.4.2, Chromium (Playwright)
+
+Resultados dos cenários de [quickstart.md](../specs/005-tema-identidade/quickstart.md) e da suíte
+automatizada. A foto do hero é a foto real aprovada, não o placeholder.
+
+## Resumo
+
+| Verificação | Comando | Resultado |
+|---|---|---|
+| Conteúdo (5 categorias, fotos, home, Sobre, hero) | `npm run validate:content` | ✅ 5 categorias, 6 fotos, home e Sobre |
+| Regras de conteúdo e identidade (unitárias) | `npm run test:content` | ✅ 26/26 |
+| Tipos e Astro | `npm run check` | ✅ 0 erros, 0 avisos, 0 dicas (51 arquivos) |
+| Build + orçamento de imagens | `npm run build` | ✅ 6 páginas; 20 variantes de grade ≤ 300 KB |
+| E2E + acessibilidade (desktop, tablet e mobile) | `npm run test:e2e` | ✅ 204/204 |
+| Lighthouse CI (mobile, 4G simulado) | `npm run test:lighthouse` | ✅ 5 rotas aprovadas |
+
+Rotas geradas: `/`, `/portfolio/`, `/sobre/`, `/contato/`, `/contato/enviado/`, `/privacidade/`.
+
+## Resultados do Lighthouse
+
+| Rota | Performance | Acessibilidade | Boas práticas | SEO | LCP | CLS | TBT |
+|---|---|---|---|---|---|---|---|
+| `/` | 100 | 100 | 96 | 100 | 1,7 s | 0 | 0 ms |
+| `/portfolio/` | 100 | 100 | 96 | 100 | 1,7 s | 0 | 0 ms |
+| `/contato/` | 100 | 100 | 96 | 100 | 1,5 s | 0 | 0 ms |
+| `/sobre/` | 100 | 100 | 96 | 100 | 1,5 s | 0 | 0 ms |
+| `/privacidade/` | 100 | 100 | 96 | 100 | 1,5 s | 0 | 0 ms |
+
+As asserções de `.lighthouserc.json` (acessibilidade 100, desempenho ≥ 90, LCP < 3 s, CLS < 0,1)
+passaram nas cinco rotas. Nenhum script de terceiros é carregado.
+
+## Cenário 1 — Identidade reconhecível
+
+- Paleta `#F7F3EE`, `#EFE8DE`, `#2B2622`, `#6B615A`, `#B5715A` e `#8E5238` aplicada em tokens e
+  componentes; `#B5715A` restrito a detalhes, bordas e títulos grandes.
+- Cormorant Garamond nos títulos e Inter no corpo, ambas auto-hospedadas em `public/fonts/` com
+  `@font-face`, `font-display: swap` e preload de dois arquivos latin.
+- `theme-color` `#F7F3EE`, contraste AA verificado por teste unitário e axe, zero roxo no CSS
+  publicado e zero rolagem horizontal em 360, 640, 768 e 1280 px. A largura de 640 px cobre o
+  equivalente ao zoom de 200% em uma janela de 1280 px.
+
+**Resultado**: ✅ aprovado (`tests/content/identity.test.mjs`, `tests/e2e/identity.spec.ts` e axe).
+
+## Cenário 2 — Galeria protagonista
+
+- `/portfolio/` abre em “Todos”, com as cinco seções visíveis na ordem Casamentos, Ensaios, Família,
+  Newborn e Eventos.
+- O filtro atualiza a URL com `pushState`, esconde as demais seções, preserva o botão voltar e volta
+  a “Todos” quando o slug é inválido ou quando “Todos” é acionado.
+- O mosaico usa CSS columns (1/2/3 colunas), sem recorte e sem biblioteca de terceiros.
+- O lightbox percorre todas as fotos visíveis em “Todos” e apenas a categoria filtrada quando há
+  `?categoria=`, com ciclo por setas, `Esc` e retorno de foco.
+- Sem JavaScript, todas as seções continuam visíveis e os cartões abrem a imagem ampliada.
+
+**Resultado**: ✅ aprovado (`gallery.spec.ts` e `lightbox.spec.ts`).
+
+## Cenário 3 — Caminho para contratar
+
+- Cabeçalho com logo em texto, menu Início/Portfólio/Contato e CTA “Solicitar orçamento” com alvo
+  ≥ 44 px.
+- WhatsApp com mensagem pré-preenchida, Instagram `@faby.fonseca.fotografia` e e-mail
+  `juninho.fonseca@gmail.com` no contato e no rodapé.
+- CTA de orçamento do portfólio aponta para `/contato/?categoria=<slug>` com a categoria
+  pré-selecionada; em “Todos”, aponta para `/contato/`.
+- Formulário mantém consentimento LGPD, validação, estados de erro/sucesso e envio sem JavaScript.
+
+**Resultado**: ✅ aprovado (`home.spec.ts`, `contact-cta.spec.ts` e `contact-form.spec.ts`).
+
+## Cenário 4 — Página Sobre
+
+- `/sobre/` exibe título, introdução, o corpo Markdown completo renderizado e a data “Atualizado em”.
+- A página é alcançável pelo link “Conhecer a Faby” na home e pelo link “Sobre” no rodapé de todas as
+  páginas.
+- Metadados próprios (`title`, `description`, canônico, Open Graph `article` e imagem padrão).
+- `/sobre/` consta no sitemap e `/contato/enviado/` não consta.
+
+**Resultado**: ✅ aprovado (`sobre.spec.ts` e `a11y/sobre.spec.ts`).
+
+## Cenário 5 — Edição sem programar
+
+- `.pages.yml` tem cinco fontes de mídia, o grupo **Portfólio** com cinco arquivos, a home e a Sobre;
+  `featuredCategories` é um `select` fixo de três categorias; `active` é somente leitura.
+- A Sobre usa a chave especial `body` como `rich-text` (`format: markdown`, `media: false`,
+  `required: true`), gravada abaixo do frontmatter.
+- O formato foi validado por build local com o mesmo formato que o painel grava.
+
+**Resultado**: ⏳ configuração validada; execução no Pages CMS real pendente (T058).
+
+## Cenário 6 — Portão do hero
+
+- `content/home/images/hero-home.jpg`: 4898 × 3266 px, 817.590 bytes, SHA-256
+  `be633aa29f0addad9b95a0c3f2373a7e8547f6e8ac1d8edaa73f3740b29b37c0`.
+- `validate:content` lê as dimensões com `sharp`, exige largura e altura ≥ 2400 px, rejeita o hash do
+  placeholder antigo e exige `heroAlt` que não descreva a foto provisória.
+- A home exibe a foto em retrato 3:4 com `object-position: 72% center`, `loading="eager"`,
+  `fetchpriority="high"` e dimensões explícitas.
+
+**Resultado**: ✅ aprovado.
+
+## Cenário 7 — Privacidade e remoções
+
+- A política mantém as 11 seções e afirma explicitamente que o site não usa analytics, cookies de
+  medição ou rastreadores.
+- Busca no `dist/` por `giscus`, `prefers-color-scheme`, `dark`, `lang-switch`, `i18n`, `gtag`,
+  `plausible`, `umami` e os oito hexadecimais roxos: zero ocorrências.
+- A única ocorrência da palavra “analytics” está na própria declaração de ausência da política.
+
+**Resultado**: ✅ aprovado.
+
+## Recusas de validação comprovadas
+
+Testes em cópia descartável de `content/` e `scripts/`, restaurada em seguida:
+
+| Alteração | Mensagem |
+|---|---|
+| Foto sem `alt` | `O texto alternativo é obrigatório.` |
+| Categoria com `active: false` | `"active" deve ser sempre true nesta versão.` e `Esperadas exatamente 5 categorias ativas, encontradas 4.` |
+| `heroAlt` descrevendo a foto provisória | `"heroAlt" ainda descreve a foto provisória.` |
+| `featuredCategories` com slug inexistente | `Categoria em destaque inexistente ou inativa: "nao-existe".` |
+| Hero com 1200 × 800 px | `A foto do hero precisa ter largura e altura de pelo menos 2400 px (atual: 1200 × 800).` |
+
+A variante de grade acima de 300 KB é coberta por `tests/content/invariants.test.mjs` e pelo
+`check-image-budget.mjs` no build.
+
+## Deploy de produção
+
+- URL publicada: **https://juninhofonseca.github.io/faby-fonseca-site/**
+- O build de produção continua usando `SITE_URL` e `SITE_BASE` no workflow do GitHub Pages.
+- A conferência no site publicado deve ser feita depois do commit e do workflow **Deploy**.
+
+## Pendências desta feature
+
+1. **Execução no Pages CMS real (T058)** — publicar uma foto de teste, editar descrição, home e o
+   corpo da Sobre, conferir o deploy, tentar publicar foto sem `alt` e reverter a foto de teste.
+2. **Conferência no site publicado (T069)** — hero aprovado, `/sobre/` no sitemap,
+   `/contato/enviado/` fora do sitemap e OG respondendo.
+3. **Domínio próprio** — dívida aceita; a migração é feita por `SITE_URL`/`SITE_BASE`.

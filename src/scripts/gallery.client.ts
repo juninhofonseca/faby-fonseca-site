@@ -9,17 +9,7 @@ const budgetCta =
 const baseMeta = document.querySelector<HTMLMetaElement>('meta[name="app-base"]');
 const appBase = (baseMeta?.content ?? '/').replace(/\/$/, '');
 
-function activate(slug: string, updateUrl = true): void {
-  const target = sections.find(
-    (section) => section.dataset.gallerySection === slug,
-  );
-
-  if (!target) return;
-
-  for (const section of sections) {
-    section.hidden = section !== target;
-  }
-
+function setActiveLink(slug: string): void {
   for (const link of links) {
     const isActive = link.dataset.categoryLink === slug;
     link.classList.toggle('is-active', isActive);
@@ -30,10 +20,52 @@ function activate(slug: string, updateUrl = true): void {
       link.removeAttribute('aria-current');
     }
   }
+}
 
-  if (budgetCta) {
-    budgetCta.href = `${appBase}/contato/?categoria=${slug}`;
+function updateBudgetCta(slug: string): void {
+  if (!budgetCta) return;
+
+  budgetCta.href =
+    slug === 'todos'
+      ? `${appBase}/contato/`
+      : `${appBase}/contato/?categoria=${slug}`;
+}
+
+function showAll(updateUrl = true): void {
+  for (const section of sections) {
+    section.hidden = false;
   }
+
+  setActiveLink('todos');
+  updateBudgetCta('todos');
+
+  if (updateUrl) {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('categoria');
+    window.history.pushState({ categoria: 'todos' }, '', url);
+  }
+
+  document.dispatchEvent(
+    new CustomEvent('gallery:change', { detail: { slug: 'todos' } }),
+  );
+}
+
+function activate(slug: string, updateUrl = true): void {
+  const target = sections.find(
+    (section) => section.dataset.gallerySection === slug,
+  );
+
+  if (!target) {
+    showAll(updateUrl);
+    return;
+  }
+
+  for (const section of sections) {
+    section.hidden = section !== target;
+  }
+
+  setActiveLink(slug);
+  updateBudgetCta(slug);
 
   if (updateUrl) {
     const url = new URL(window.location.href);
@@ -62,38 +94,39 @@ for (const link of links) {
     if (!slug) return;
 
     event.preventDefault();
-    activate(slug);
+
+    if (slug === 'todos') {
+      showAll();
+    } else {
+      activate(slug);
+    }
   });
 }
 
 window.addEventListener('popstate', () => {
   const requested = new URL(window.location.href).searchParams.get('categoria');
-  const fallback = sections[0]?.dataset.gallerySection;
+  const isValid =
+    requested &&
+    sections.some((section) => section.dataset.gallerySection === requested);
 
-  if (requested) {
+  if (requested && isValid) {
     activate(requested, false);
-  } else if (fallback) {
-    activate(fallback, false);
+  } else {
+    showAll(false);
   }
 });
 
-/*
- * O site é estático: o servidor não lê a query string no build. Por isso a
- * categoria pedida na URL é resolvida aqui, no primeiro carregamento. Sem
- * JavaScript todas as seções ficam visíveis (ver `noscript` do layout), o que
- * preserva o acesso ao conteúdo em links compartilhados.
- */
 const requestedOnLoad = new URL(window.location.href).searchParams.get(
   'categoria',
 );
-const initialSlug =
+const initialIsValid =
   requestedOnLoad &&
   sections.some(
     (section) => section.dataset.gallerySection === requestedOnLoad,
-  )
-    ? requestedOnLoad
-    : sections[0]?.dataset.gallerySection;
+  );
 
-if (initialSlug) {
-  activate(initialSlug, false);
+if (requestedOnLoad && initialIsValid) {
+  activate(requestedOnLoad, false);
+} else {
+  showAll(false);
 }

@@ -16,28 +16,28 @@ const { categories, activeSlug, photosByCategory } = Astro.props;
   {
     categories.map((category) => {
       const photos = photosByCategory[category.data.slug] ?? [];
-      const isActive = category.data.slug === activeSlug;
       const headingId = `categoria-${category.data.slug}`;
+      const isHidden = Boolean(activeSlug && category.data.slug !== activeSlug);
 
       return (
         <section
           class="gallery-section"
           data-gallery-section={category.data.slug}
           aria-labelledby={headingId}
-          hidden={!isActive}
+          hidden={isHidden}
         >
-          <h2 id={headingId}>{category.data.name}</h2>
+          <header class="gallery-section__header">
+            <h2 id={headingId}>{category.data.name}</h2>
+            <p class="gallery-section__description">{category.data.description}</p>
+          </header>
+
           {photos.length === 0 ? (
             <p class="empty-state">Em breve novas fotos nesta categoria.</p>
           ) : (
             <ul class="gallery-grid" role="list">
               {photos.map((photo, index) => (
                 <li>
-                  <PhotoCard
-                    photo={photo}
-                    index={index}
-                    eager={isActive && index < 2}
-                  />
+                  <PhotoCard photo={photo} index={index} />
                 </li>
               ))}
             </ul>

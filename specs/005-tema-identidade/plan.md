@@ -20,8 +20,8 @@ rastreadores.
 
 A feature é publicada com a **foto real do hero aprovada**: `content/home/images/hero-home.jpg`,
 colorida, 4898 × 3266 px, exibida em recorte retrato 3:4 que preserva o assunto. O build bloqueia
-arquivos abaixo de 2400 px e placeholders conhecidos; a aprovação editorial da foto, do recorte e do
-texto alternativo fica registrada no checklist de release.
+arquivos com largura ou altura abaixo de 2400 px e placeholders conhecidos; a aprovação editorial da
+foto, do recorte e do texto alternativo fica registrada no checklist de release.
 
 ## Contexto Técnico
 
@@ -36,7 +36,7 @@ texto alternativo fica registrada no checklist de release.
 de dados e sem backend próprio.
 
 **Testes**: Node test (regras de conteúdo e contraste), `astro check` (tipos), Playwright (E2E em
-1280 px e 360 px), axe-core (WCAG 2.1 AA) e Lighthouse CI (4G simulada).
+360, 768 e 1280 px), axe-core (WCAG 2.1 AA) e Lighthouse CI (4G simulada).
 
 **Plataforma-alvo**: navegadores modernos em celular (360 px+), tablet e desktop; site estático em
 GitHub Pages, com HTTPS. Sem suporte a modo escuro, i18n ou comentários.
@@ -69,6 +69,22 @@ institucionais editáveis (`home` e `sobre`), 2 famílias tipográficas, 1 image
 
 **Conclusão**: o plano passa, com uma dívida explícita (domínio próprio) já registrada e aprovada no
 escopo da feature. Nenhuma violação nova.
+
+## Checklist de Privacidade e LGPD
+
+Exigido pelo Princípio VII da constituição para features que coletam dados pessoais.
+
+- [x] **Dados coletados**: nome, telefone/WhatsApp, e-mail, categoria, data e detalhes do evento,
+  enviados voluntariamente pelo formulário.
+- [x] **Finalidade**: responder ao pedido de orçamento; base legal no consentimento do titular.
+- [x] **Operador**: Web3Forms, declarado na política; nenhum outro terceiro recebe os dados.
+- [x] **Retenção**: prazo informado na política; exclusão mediante solicitação do titular.
+- [x] **Direitos do titular**: acesso, correção, exclusão e revogação do consentimento, com canal por
+  e-mail.
+- [x] **Consentimento**: checkbox obrigatório com link para `/privacidade/` e versão vigente.
+- [x] **Sem rastreamento**: nenhum analytics, cookie de medição ou script de terceiros.
+- [x] **Segredos**: nenhuma chave versionada; `PUBLIC_WEB3FORMS_KEY` vem de variável de ambiente.
+- [ ] **Verificação**: política e `tests/e2e/privacy.spec.ts` atualizados na mesma entrega (T060).
 
 ## Estrutura do Projeto
 
@@ -171,15 +187,15 @@ tests/
 │   ├── gallery.spec.ts
 │   ├── lightbox.spec.ts
 │   ├── contact-cta.spec.ts
-│   ├── contact.spec.ts
+│   ├── contact-form.spec.ts
 │   ├── privacy.spec.ts
 │   ├── sobre.spec.ts       # novo
 │   └── identity.spec.ts    # novo: header, fontes, paleta
 └── a11y/
     ├── home.spec.ts
     ├── portfolio.spec.ts
-    ├── contato.spec.ts
-    ├── privacidade.spec.ts
+    ├── contact.spec.ts
+    ├── privacy.spec.ts
     └── sobre.spec.ts       # novo
 ```
 
@@ -228,12 +244,13 @@ Saída: [data-model.md](./data-model.md), [contracts/content.md](./contracts/con
 
 Dividir em blocos verificáveis:
 
-1. **Fundação**: tokens, fontes, header/footer, layout e metadados.
-2. **Conteúdo**: schema, migração das cinco categorias e seis fotos, página Sobre.
-3. **Galeria**: mosaico, filtro, lightbox e estados vazios.
-4. **Páginas**: home, portfólio, sobre, contato, privacidade e confirmação.
-5. **CMS e validação**: `.pages.yml`, scripts, testes de conteúdo e portão do hero.
-6. **Testes e documentação**: E2E, a11y, Lighthouse, `docs/admin.md` e `README.md`.
+1. **Fundação**: conteúdo, schema, bibliotecas, CMS, validação e projeto de testes; sem mudar o
+   visual.
+2. **Identidade (US1)**: tokens, fontes, header/footer, layout e metadados.
+3. **Galeria (US2)**: mosaico, filtro, lightbox e estados vazios.
+4. **Conversão e confiança (US3/US4)**: home, contato, rodapé, Sobre e privacidade.
+5. **Autonomia (US5)**: documentação e validação do Pages CMS.
+6. **Fechamento**: E2E, a11y, Lighthouse, documentação e deploy.
 7. **Release**: conferir a foto aprovada do hero, deploy e conferência publicada.
 
 ### Fase 3 — Implementação (`/speckit.implement`)
@@ -247,7 +264,7 @@ produção só é considerado publicável com o portão do hero satisfeito.
 |---|---|---|
 | FR-001 paleta e `theme-color` | `tokens.css`, `BaseLayout.astro` | teste de contraste + `identity.spec.ts` |
 | FR-002 duas famílias auto-hospedadas | `public/fonts/`, `@font-face` | E2E de requisições + Lighthouse |
-| FR-003 cabeçalho e CTA | `SiteHeader.astro` | `identity.spec.ts` |
+| FR-003 cabeçalho e CTA | `SiteHeader.astro` | `identity.spec.ts` (logo/menu) + `home.spec.ts` (CTA) |
 | FR-004 home atual com novo visual | `index.astro`, `home/index.md` | `home.spec.ts` |
 | FR-005 hero real ≥ 2400 px | `home/index.md`, `validate-content.mjs` | portão de build + `quickstart` cenário 6 |
 | FR-006 cinco categorias em mosaico | `portfolio.astro`, `GalleryGrid.astro` | `gallery.spec.ts` |
@@ -256,20 +273,20 @@ produção só é considerado publicável com o portão do hero satisfeito.
 | FR-009 alt obrigatório | schema + `validate-content.mjs` | `invariants.test.mjs` |
 | FR-010 lazy e ≤ 300 KB | `PhotoCard.astro`, `check-image-budget.mjs` | build + `check:images` |
 | FR-011 `/sobre/` e caminhos | `sobre.astro`, `sobre/index.md` | `sobre.spec.ts` |
-| FR-012 contato mantido | `contact.ts`, `ContactForm.astro` | `contact.spec.ts`, `contact-cta.spec.ts` |
+| FR-012 contato mantido | `contact.ts`, `ContactForm.astro` | `contact-form.spec.ts`, `contact-cta.spec.ts` |
 | FR-013 política sem analytics | `privacidade.astro`, `contact.ts` | `privacy.spec.ts` |
 | FR-014 sem demonstração/idioma/dark | CSS, componentes, conteúdo | busca no `dist/` + `identity.spec.ts` |
-| FR-015 metadados e OG | `BaseLayout.astro`, `public/og/` | E2E + Lighthouse SEO |
+| FR-015 metadados e OG | `BaseLayout.astro`, `public/og/`, `astro.config.mjs` | E2E de metadados por página + sitemap sem `/contato/enviado/` + Lighthouse SEO |
 | FR-016 URLs preservadas + `/sobre/` | `astro.config.mjs`, páginas | E2E de links + sitemap |
 | FR-017 360 px e teclado | `global.css` | E2E 360/768/1280 + axe |
 | FR-018 contraste AA | `tokens.css` | `identity.test.mjs` + axe |
 | FR-019 sem JavaScript | HTML/CSS + progressão | E2E com JS desabilitado |
-| FR-020 sem framework de UI | `package.json` | revisão de diff |
-| FR-021 CMS em pastas | `.pages.yml`, `content/portfolio/` | cenário 5 do quickstart |
+| FR-020 sem framework de UI | `package.json` | conferência de dependências + busca no `dist/` |
+| FR-021 CMS em pastas, home e Sobre | `.pages.yml`, `content/portfolio/`, `content/sobre/` | cenário 5 do quickstart |
 | FR-022 validação bloqueante | scripts + CI | jobs de CI |
 | SC-001 sem roxo | tokens e CSS | busca + teste |
 | SC-002 contraste | tokens | teste + axe |
-| SC-003 LCP/CLS/Lighthouse | hero e imagens | Lighthouse CI |
+| SC-003 LCP/CLS/Lighthouse | hero e imagens | Lighthouse CI com performance ≥ 90 |
 | SC-004 alt e 300 KB | validação + build | CI |
 | SC-005 cinco categorias e filtros | portfólio | `gallery.spec.ts` |
 | SC-006 URLs e sitemap | rotas | E2E + sitemap |

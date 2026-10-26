@@ -17,7 +17,8 @@ comportamento das páginas em [contracts/pages.md](./contracts/pages.md).
   direito de uso confirmado e recorte retrato 3:4 aprovado.
 
 > A foto, o recorte e o texto alternativo foram aprovados em 2026-10-25. O build continua bloqueando
-> arquivos abaixo de 2400 px e placeholders conhecidos; o checklist de release registra a aprovação.
+> arquivos com largura ou altura abaixo de 2400 px e placeholders conhecidos; o checklist de release
+> registra a aprovação.
 
 ## Instalação e execução
 
@@ -29,7 +30,7 @@ npm run dev          # http://localhost:4321
 Build e verificações:
 
 ```bash
-npm run validate:content   # schema, alt, imagens, hero ≥ 2400 px, contraste
+npm run validate:content   # schema, alt, imagens, hero (largura e altura ≥ 2400 px) e corpo do Sobre
 npm run test:content       # regras unitárias (inclui contraste e ausência de roxo)
 npm run check              # tipos e Astro
 npm run build              # gera dist/ e verifica o orçamento de imagens
@@ -39,7 +40,7 @@ npm run preview            # serve o build em http://localhost:4321
 Testes automatizados:
 
 ```bash
-npm run test:e2e           # desktop 1280 px + mobile 360 px
+npm run test:e2e           # desktop 1280 px + tablet 768 px + mobile 360 px
 npm run test:a11y          # axe-core em todas as páginas
 npm run test:lighthouse    # /, /portfolio/, /contato/, /sobre/, /privacidade/
 ```
@@ -49,7 +50,8 @@ npm run test:lighthouse    # /, /portfolio/, /contato/, /sobre/, /privacidade/
 
 ## Cenário 1 — Identidade reconhecível (História 1)
 
-1. Abrir `/`, `/portfolio/`, `/contato/`, `/sobre/` e `/privacidade/` em 360 px e em 1280 px.
+1. Abrir `/`, `/portfolio/`, `/contato/` e `/privacidade/` em 360 px, 768 px e 1280 px. A página
+   `/sobre/` é conferida no cenário 4.
 2. Conferir:
    - fundo `#F7F3EE`, texto `#2B2622`, apoio `#6B615A`;
    - `#B5715A` apenas em detalhes, bordas e títulos grandes;
@@ -61,7 +63,8 @@ npm run test:lighthouse    # /, /portfolio/, /contato/, /sobre/, /privacidade/
    fallback de sistema, sem sumir nem deslocar o layout de forma perceptível.
 4. Rodar `npm run test:content` e confirmar o teste de contraste.
 
-**Evidência**: capturas em 360 px e 1280 px das cinco páginas + saída do teste de contraste.
+**Evidência**: capturas em 360 px, 768 px e 1280 px das páginas verificadas + saída do teste de
+contraste.
 
 ## Cenário 2 — Galeria protagonista (História 2)
 
@@ -103,7 +106,8 @@ npm run test:lighthouse    # /, /portfolio/, /contato/, /sobre/, /privacidade/
 2. Confirmar que `/sobre/` mostra o texto completo de apresentação, em pt-BR, sem dados inventados.
 3. Acionar os links para o portfólio e para o orçamento.
 4. No rodapé de qualquer página, acionar **Sobre** e **Política de Privacidade**.
-5. Confirmar `/sobre/` no `sitemap-index.xml` (ou `sitemap-0.xml`).
+5. Confirmar `/sobre/` no `sitemap-index.xml` (ou `sitemap-0.xml`) e que `/contato/enviado/` não
+   aparece no sitemap.
 
 **Evidência**: `npm run test:e2e` (sobre) + captura das duas páginas.
 
@@ -113,7 +117,8 @@ npm run test:lighthouse    # /, /portfolio/, /contato/, /sobre/, /privacidade/
 2. Publicar uma foto de teste com título, texto alternativo e ordem; confirmar que a imagem é gravada
    em `content/portfolio/casamentos/imagens/`.
 3. Alterar a descrição curta da categoria e publicar.
-4. Alterar um texto da home e o texto da página Sobre; publicar.
+4. Alterar um texto da home e o texto completo da página Sobre (campo **Texto de apresentação**);
+   publicar.
 5. Aguardar o workflow **Deploy** e conferir o site.
 6. Remover a foto de teste depois da conferência.
 7. Tentar publicar uma foto sem texto alternativo e confirmar que o workflow **CI/Deploy** falha com
@@ -134,9 +139,9 @@ npm run test:lighthouse    # /, /portfolio/, /contato/, /sobre/, /privacidade/
    - O hero é a foto real, exibido em retrato 3:4, com o assunto preservado.
 5. Confirmar no HTML que o hero tem `loading="eager"`, `fetchpriority="high"`, `width`/`height` e
    `alt` descritivo.
-6. Repetir com uma imagem abaixo de 2400 px para confirmar que o build falha com mensagem clara.
+6. Repetir com uma imagem com largura ou altura abaixo de 2400 px para confirmar que o build falha com mensagem clara.
 
-**Evidência**: log da falha e do sucesso + captura do hero em 360 px e 1280 px.
+**Evidência**: log da falha e do sucesso + captura do hero em 360 px, 768 px e 1280 px.
 
 ## Cenário 7 — Privacidade e remoções (FR-013/FR-014)
 
@@ -176,18 +181,18 @@ Metas:
 
 ## Checklist de release
 
-- [ ] Foto real do hero aprovada, ≥ 2400 px no lado maior e na altura, recorte retrato 3:4
+- [ ] Foto real do hero aprovada, largura e altura ≥ 2400 px, recorte retrato 3:4
       preservando o assunto, direito de uso confirmado.
 - [ ] `heroAlt` descreve a foto publicada.
 - [ ] `npm run validate:content` verde.
 - [ ] `npm run test:content` verde.
 - [ ] `npm run check` sem erros.
 - [ ] `npm run build` verde e orçamento de imagens respeitado.
-- [ ] `npm run test:e2e` verde em desktop e mobile.
+- [ ] `npm run test:e2e` verde em desktop, tablet e mobile.
 - [ ] `npm run test:a11y` verde.
-- [ ] `npm run test:lighthouse` verde com `/sobre/` incluído.
+- [ ] `npm run test:lighthouse` verde com `/sobre/` incluído e desempenho ≥ 90.
 - [ ] Nenhuma cor roxa, comentário, seletor de idioma ou modo escuro no `dist/`.
-- [ ] `/sobre/` no sitemap e acessível pela home e pelo rodapé.
+- [ ] `/sobre/` no sitemap, `/contato/enviado/` fora dele, e a página acessível pela home e pelo rodapé.
 - [ ] Política de privacidade com data atualizada e ausência de analytics declarada.
 - [ ] Deploy do GitHub Pages concluído e site publicado conferido.
 
@@ -195,13 +200,14 @@ Metas:
 
 | Sintoma | Causa provável | Correção |
 |---|---|---|
-| Build falha com “lado maior < 2400 px” | foto do hero pequena ou substituída | restaurar a foto aprovada em alta resolução |
+| Build falha com “largura ou altura < 2400 px” | foto do hero pequena ou substituída | restaurar a foto aprovada em alta resolução |
 | Build falha com “imagem não existe” | caminho fora de `imagens/` ou arquivo não versionado | conferir o caminho relativo ao `index.md` e o commit da imagem |
 | Variante acima de 300 KB | exportação muito pesada | reduzir qualidade/largura ou reexportar em WebP |
 | Fonte não carrega | caminho em `public/fonts/` ou `base` errado | conferir `@font-face` e `withBase()` |
 | Filtro não esconde a categoria | query inválida ou script não carregado | conferir `data-gallery-section`, `data-category-link` e o console |
 | Lighthouse mede a página errada | preview antigo na porta 4322 | encerrar com `npx astro preview stop` e repetir |
 | Sobre fora do sitemap | integração não regenerou | rodar `npm run build` novamente e conferir `dist/sitemap-*.xml` |
+| `/contato/enviado/` no sitemap | filtro do `@astrojs/sitemap` ausente | conferir `astro.config.mjs` e rebuildar |
 
 ## Dívida conhecida
 

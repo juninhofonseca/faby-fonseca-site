@@ -10,30 +10,32 @@ const slugSchema = z
   );
 
 const categories = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './content/categories' }),
-  schema: z.object({
-    name: z.string().min(1, 'O nome da categoria é obrigatório.').max(60),
-    slug: slugSchema,
-    description: z.string().max(160).optional(),
-    order: z.number().int().min(0, 'A ordem deve ser 0 ou maior.'),
-    active: z.boolean().default(true),
-  }),
-});
-
-const photos = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './content/photos' }),
+  loader: glob({ pattern: '**/index.md', base: './content/portfolio' }),
   schema: ({ image }) =>
     z.object({
-      title: z.string().min(1, 'O título interno é obrigatório.').max(80),
-      alt: z
+      name: z.string().min(1, 'O nome da categoria é obrigatório.').max(60),
+      slug: slugSchema,
+      description: z
         .string()
-        .min(1, 'O texto alternativo é obrigatório.')
-        .max(160, 'O texto alternativo deve ter no máximo 160 caracteres.'),
-      image: image(),
-      category: slugSchema,
+        .min(1, 'A descrição curta é obrigatória.')
+        .max(160, 'A descrição curta deve ter no máximo 160 caracteres.'),
       order: z.number().int().min(0, 'A ordem deve ser 0 ou maior.'),
-      publishedAt: z.coerce.date(),
-      published: z.boolean().default(true),
+      active: z.boolean().default(true),
+      photos: z
+        .array(
+          z.object({
+            title: z.string().min(1, 'O título interno é obrigatório.').max(80),
+            alt: z
+              .string()
+              .min(1, 'O texto alternativo é obrigatório.')
+              .max(160, 'O texto alternativo deve ter no máximo 160 caracteres.'),
+            image: image(),
+            order: z.number().int().min(0, 'A ordem deve ser 0 ou maior.'),
+            published: z.boolean().default(true),
+            publishedAt: z.coerce.date().optional(),
+          }),
+        )
+        .default([]),
     }),
 });
 
@@ -64,11 +66,28 @@ const home = defineCollection({
         .string()
         .min(1, 'O título da seção sobre a Faby é obrigatório.')
         .max(60, 'O título da seção sobre a Faby deve ter no máximo 60 caracteres.'),
-      aboutText: z
+      aboutSummary: z
         .string()
-        .min(1, 'O texto sobre a Faby é obrigatório.')
-        .max(600, 'O texto sobre a Faby deve ter no máximo 600 caracteres.'),
+        .min(1, 'O resumo sobre a Faby é obrigatório.')
+        .max(400, 'O resumo sobre a Faby deve ter no máximo 400 caracteres.'),
     }),
 });
 
-export const collections = { categories, photos, home };
+const sobre = defineCollection({
+  loader: glob({ pattern: 'index.md', base: './content/sobre' }),
+  schema: ({ image }) =>
+    z
+      .object({
+        title: z.string().min(1, 'O título é obrigatório.').max(80),
+        intro: z.string().min(1, 'A introdução é obrigatória.').max(240),
+        image: image().optional(),
+        imageAlt: z.string().max(160, 'O texto alternativo deve ter no máximo 160 caracteres.').optional(),
+        updatedAt: z.coerce.date().optional(),
+      })
+      .refine((data) => !data.image || Boolean(data.imageAlt?.trim()), {
+        message: 'O texto alternativo do retrato é obrigatório quando há imagem.',
+        path: ['imageAlt'],
+      }),
+});
+
+export const collections = { categories, home, sobre };

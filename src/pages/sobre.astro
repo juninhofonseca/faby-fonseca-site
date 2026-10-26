@@ -1,0 +1,64 @@
+---
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getSobre } from '../lib/sobre';
+import { withBase } from '../lib/urls';
+
+const sobre = await getSobre();
+const { Content } = await render(sobre);
+const { title, intro, image, imageAlt, updatedAt } = sobre.data;
+
+const updatedLabel = updatedAt
+  ? new Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(updatedAt)
+  : null;
+---
+
+<BaseLayout
+  title="Sobre | Faby Fonseca Fotografia"
+  description="Conheça Faby Fonseca e sua forma de fotografar histórias."
+  ogType="article"
+>
+  <article class="about-page" data-about-page>
+    <h1>{title}</h1>
+    <p class="page-intro">{intro}</p>
+
+    {
+      image && imageAlt ? (
+        <figure class="about-page__portrait">
+          <Image
+            src={image}
+            alt={imageAlt}
+            widths={[480, 800, 1200]}
+            sizes="(max-width: 767px) 100vw, 40vw"
+            loading="lazy"
+          />
+        </figure>
+      ) : null
+    }
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    {
+      updatedLabel ? (
+        <p class="about-page__updated">Atualizado em {updatedLabel}.</p>
+      ) : null
+    }
+
+    <div class="about-page__actions">
+      <a class="button" href={withBase('/portfolio/')} data-about-cta="portfolio">
+        Ver o portfólio
+      </a>
+      <a class="button button--secondary" href={withBase('/contato/')} data-about-cta="orcamento">
+        Solicitar orçamento
+      </a>
+    </div>
+  </article>
+</BaseLayout>

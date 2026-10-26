@@ -88,4 +88,46 @@ test.describe('Visualização ampliada', () => {
 
     expect(focusInside).toBe(true);
   });
+
+  test('em Todos percorre as fotos de todas as categorias visíveis', async ({ page }) => {
+    await page.goto('/portfolio/');
+
+    const cards = page.locator(
+      '[data-gallery-section]:not([hidden]) [data-photo-card]',
+    );
+    await expect(cards).toHaveCount(6);
+
+    await cards.first().click();
+    await expect(page.locator('[data-lightbox-position]')).toHaveText('Foto 1 de 6');
+
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('ArrowRight');
+    await expect(page.locator('[data-lightbox-position]')).toHaveText('Foto 3 de 6');
+
+    const nextAlt = await cards.nth(3).getAttribute('data-alt');
+    await page.keyboard.press('ArrowRight');
+    await expect(page.locator('[data-lightbox-position]')).toHaveText('Foto 4 de 6');
+    await expect(page.locator('[data-lightbox-image]')).toHaveAttribute(
+      'alt',
+      nextAlt ?? '',
+    );
+  });
+
+  test('com filtro percorre apenas as fotos da categoria visível', async ({ page }) => {
+    await page.goto('/portfolio/?categoria=ensaios');
+
+    const cards = page.locator(
+      '[data-gallery-section="ensaios"] [data-photo-card]',
+    );
+    await expect(cards).toHaveCount(2);
+
+    await cards.first().click();
+    await expect(page.locator('[data-lightbox-position]')).toHaveText('Foto 1 de 2');
+
+    await page.keyboard.press('ArrowRight');
+    await expect(page.locator('[data-lightbox-position]')).toHaveText('Foto 2 de 2');
+
+    await page.keyboard.press('ArrowRight');
+    await expect(page.locator('[data-lightbox-position]')).toHaveText('Foto 1 de 2');
+  });
 });

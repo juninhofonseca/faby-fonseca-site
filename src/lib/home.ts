@@ -20,48 +20,39 @@ export async function getHome(): Promise<Home> {
 }
 
 /**
- * Resolve as categorias em destaque mantendo a ordem escolhida no conteúdo.
- * Slugs inexistentes, inativos ou repetidos são ignorados e as vagas restantes
- * são completadas com as próximas categorias ativas, na ordem do portfólio.
+ * Resolve as categorias em destaque. Exige exatamente três slugs distintos,
+ * existentes e ativos, e devolve os cartões na ordem `order` das categorias.
+ * Qualquer divergência falha o build em vez de completar as vagas.
  */
 export function resolveFeaturedCategories(
   categories: Category[],
   slugs: string[],
-  limit = 3,
 ): Category[] {
+  if (!Array.isArray(slugs) || slugs.length !== 3) {
+    throw new Error('Escolha exatamente 3 categorias em destaque.');
+  }
+
+  if (new Set(slugs).size !== slugs.length) {
+    throw new Error('As categorias em destaque não podem se repetir.');
+  }
+
   const bySlug = new Map(
     categories.map((category) => [category.data.slug, category]),
   );
-  const picked: Category[] = [];
-  const seen = new Set<string>();
 
-  for (const slug of slugs) {
-    if (picked.length >= limit) break;
-
+  const selected = slugs.map((slug) => {
     const category = bySlug.get(slug);
-    if (!category || seen.has(slug)) continue;
 
-    picked.push(category);
-    seen.add(slug);
-  }
+    if (!category) {
+      throw new Error(`Categoria em destaque inexistente ou inativa: "${slug}".`);
+    }
 
-  for (const category of categories) {
-    if (picked.length >= limit) break;
+    return category;
+  });
 
-    const { slug } = category.data;
-    if (seen.has(slug)) continue;
-
-    picked.push(category);
-    seen.add(slug);
-  }
-
-  return picked;
-}
-
-/** Divide o texto editável em parágrafos, respeitando linhas em branco. */
-export function splitParagraphs(text: string): string[] {
-  return text
-    .split(/\n{2,}/)
-    .map((paragraph) => paragraph.trim())
-    .filter(Boolean);
+  return selected.sort(
+    (a, b) =>
+      a.data.order - b.data.order ||
+      a.data.name.localeCompare(b.data.name, 'pt-BR'),
+  );
 }

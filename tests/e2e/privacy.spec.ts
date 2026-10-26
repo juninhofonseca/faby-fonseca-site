@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Política de privacidade', () => {
   test('é alcançável pelo rodapé de todas as páginas', async ({ page }) => {
-    for (const path of ['/', '/portfolio/', '/contato/']) {
+    for (const path of ['/', '/portfolio/', '/contato/', '/sobre/']) {
       await page.goto(path);
 
       const link = page.locator('.site-footer a', { hasText: 'Política de Privacidade' });
@@ -30,6 +30,7 @@ test.describe('Política de privacidade', () => {
     expect(content).toContain('Web3Forms');
     expect(content).toContain('LGPD');
     expect(content).toContain('não usa cookies');
+    expect(content).toContain('rastreadores');
     expect(content).toContain('juninho.fonseca@gmail.com');
     expect(content).toMatch(/Versão 2026-10-25 — vigente desde 25\/10\/2026/);
   });
@@ -43,13 +44,20 @@ test.describe('Política de privacidade', () => {
     await expect(consent.locator('[data-field="consent"]')).not.toBeChecked();
   });
 
-  test('aparece no sitemap', async ({ request }) => {
+  test('aparece no sitemap e a confirmação não aparece', async ({ request }) => {
     const sitemap = await request.get('/sitemap-index.xml');
     expect(sitemap.ok()).toBeTruthy();
 
     const index = await sitemap.text();
     const urls = [...index.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
-
     expect(urls.join(' ')).toContain('sitemap-0.xml');
+
+    const detail = await request.get('/sitemap-0.xml');
+    expect(detail.ok()).toBeTruthy();
+    const detailText = await detail.text();
+
+    expect(detailText).toContain('/privacidade/');
+    expect(detailText).toContain('/sobre/');
+    expect(detailText).not.toContain('/contato/enviado/');
   });
 });
