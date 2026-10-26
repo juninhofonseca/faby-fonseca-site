@@ -589,13 +589,20 @@ A variante de grade acima de 300 KB é coberta por `tests/content/invariants.tes
 ## Deploy de produção
 
 - URL publicada: **https://juninhofonseca.github.io/faby-fonseca-site/**
-- O build de produção continua usando `SITE_URL` e `SITE_BASE` no workflow do GitHub Pages.
-- A conferência no site publicado deve ser feita depois do commit e do workflow **Deploy**.
+- Commit publicado: `d86cd06` (`feat: identidade visual e portfólio centrado na galeria (005)`).
+- Workflow **Deploy** (run 40250881932) e **CI** (run 40250881933) concluídos com sucesso.
+- Verificado no site publicado:
+  - `/`, `/portfolio/`, `/contato/`, `/contato/enviado/`, `/privacidade/` e `/sobre/` respondem 200;
+  - `/sitemap-0.xml` contém `/sobre/` e não contém `/contato/enviado/`; a confirmação tem `noindex`;
+  - `/og/default.jpg` responde 200 como imagem e o `og:image` usa a URL absoluta com o prefixo do
+    projeto;
+  - o hero publicado é a foto real aprovada, com o texto alternativo novo e variantes sob
+    `/faby-fonseca-site/_astro/`;
+  - as fontes carregam de `/faby-fonseca-site/fonts/`, sem domínio externo;
+  - o CSS publicado não contém roxo, `prefers-color-scheme` nem scripts de analytics.
 
 ## Pendências desta feature
 
 1. **Execução no Pages CMS real (T058)** — publicar uma foto de teste, editar descrição, home e o
    corpo da Sobre, conferir o deploy, tentar publicar foto sem `alt` e reverter a foto de teste.
-2. **Conferência no site publicado (T069)** — hero aprovado, `/sobre/` no sitemap,
-   `/contato/enviado/` fora do sitemap e OG respondendo.
-3. **Domínio próprio** — dívida aceita; a migração é feita por `SITE_URL`/`SITE_BASE`.
+2. **Domínio próprio** — dívida aceita; a migração é feita por `SITE_URL`/`SITE_BASE`.

@@ -195,8 +195,8 @@ pelo painel; conferir o deploy e o bloqueio de uma publicação inválida.
 - [x] T065 Verificar manualmente 360, 768 e 1280 px, navegação por teclado, zoom de 200%, foco visível, alvos ≥ 44 px, contraste e ausência de rolagem horizontal
 - [x] T066 Procurar em `dist/` por `giscus`, `prefers-color-scheme`, `dark`, `lang-switch`, `i18n`, `analytics`, `gtag`, `plausible`, `umami`, `#7C3AED`, `#8B5CF6`, `#A855F7`, `#6D28D9`, `#5B21B6`, `#4C1D95`, `#9333EA` e `#C084FC`, confirmar zero ocorrências e conferir em `package.json` que nenhum framework de UI, tema de terceiros ou conteúdo de demonstração foi adicionado
 - [x] T067 Atualizar `docs/validation.md` com a seção da feature 005: resultados, métricas, cobertura automatizada, aprovação da foto do hero e pendências
-- [ ] T068 Fazer commit, push em `main`, acompanhar os workflows **CI** e **Deploy** e verificar `/`, `/portfolio/`, `/contato/`, `/sobre/` e `/privacidade/` na URL publicada
-- [ ] T069 Confirmar no site publicado que o hero é a foto aprovada, que `/sobre/` está no sitemap e `/contato/enviado/` não está, que o OG responde e que nenhum placeholder do tema aparece
+- [x] T068 Fazer commit, push em `main`, acompanhar os workflows **CI** e **Deploy** e verificar `/`, `/portfolio/`, `/contato/`, `/sobre/` e `/privacidade/` na URL publicada
+- [x] T069 Confirmar no site publicado que o hero é a foto aprovada, que `/sobre/` está no sitemap e `/contato/enviado/` não está, que o OG responde e que nenhum placeholder do tema aparece
 
 ---
 
